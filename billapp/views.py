@@ -3030,3 +3030,21 @@ def get_bill_date(request):
         return JsonResponse({'error': 'Multiple PurchaseBills found for the same bill number'}, status=400)
 
     return JsonResponse({'bill_date': bill_date})
+
+
+def additional_party_details(request):
+    if request.method == 'POST' and request.is_ajax():
+        party_id = request.POST.get('id')
+        try:
+            party = Party.objects.get(id=party_id)
+            # Assuming Party model has fields: contact, address, balance
+            data = {
+                'contact': party.contact,
+                'address': party.address,
+                'balance': party.balance,
+            }
+            return JsonResponse(data)
+        except Party.DoesNotExist:
+            return JsonResponse({'error': 'Party not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request'}, status=400)

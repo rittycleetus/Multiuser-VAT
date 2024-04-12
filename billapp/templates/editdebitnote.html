@@ -299,7 +299,7 @@
                         <label for="bill">Select Bill</label>
                         <select id="bill" name="bill" class="form-control"  readonly >
                            
-                                <option value="{{ billno }}">{{ billno }}</option>
+                                <option value="{{ billno }}">{{ 'bill-no' }}</option>
                            
                         </select>
                     </div>
@@ -1311,45 +1311,32 @@
     // Set the value of the input field to the current date
     document.getElementById("current-date").value = currentDate;
 </script>
+
 <script>
     $(document).ready(function () {
-        // Function to handle party selection
-        function handlePartySelection(selectedOption) {
-            var addressSection = $("#partyAddressGroup");
-            var billDropdown = $("#bill");
-            var billDateInput = $("#bill_date");
-
-            // Update the "Select Bill" dropdown options
-            billDropdown.empty();
-            if (selectedOption.data('billno') !== undefined) {
-                billDropdown.append($('<option>', {
-                    value: selectedOption.data('billno'),
-                    text: selectedOption.data('billno')
-                }));
-            } else {
-                billDropdown.append($('<option>', {
-                    value: "",
-                    text: "No bills available for the selected party."
-                }));
-            }
-            
-            // Set the value of the "Bill Date" input field
-            if (selectedOption.data('billdate') !== undefined) {
-                billDateInput.val(selectedOption.data('billdate'));
-            } else {
-                billDateInput.val("No bill date available");
-            }
-
-            var address = selectedOption.data("address");
-            if (address && address.trim() !== "") {
-                // Display the address section
-                addressSection.show();
-            } else {
-                // Hide the address section
-                addressSection.hide();
-            }
-        }
-
+        // Event listener for the 'bill' dropdown
+        $('#bill').on('change', function () {
+            var selectedBillNo = $(this).val();
+            console.log(selectedBillNo);
+    
+            // Make an AJAX request to get the date for the selected bill number
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'get_bill_date' %}",
+                data: {
+                    bill_no: selectedBillNo,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function (dateData) {
+                    // Clear existing options in the 'bill_date' input field
+                    $('#bill_date').val(dateData.bill_date);
+                },
+                error: function () {
+                    console.log("Error occurred while fetching bill date.");
+                }
+            });
+        });
+    
         // Trigger party selection on page load and change
         $('#party').change(function () {
             var selectedOption = $(this).find(':selected');
@@ -1363,6 +1350,100 @@
         // Trigger party selection when the page loads initially
         $('#party').trigger('change');
     });
+</script>
+<script>
+    function handlePartySelection(selectedOption) {
+
+        var address = selectedOption.data("address");
+        var addressSection = $("#partyAddressGroup");
+        var billDropdown = $("#bill");
+        var billDateDropdown = $("#bill_date");
+    
+
+        $('#party_address').val(address);
+        // Clear existing options in the bill and bill_date dropdowns
+        billDropdown.empty();
+        billDateDropdown.empty();
+    
+        // Make an AJAX request to get bill numbers and dates for the selected party
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'purchasebilldata' %}",
+            data: {
+                id: selectedOption.val(), // Pass the selected party ID
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function (data) {
+                if (data.bill_numbers && data.bill_dates && data.bill_numbers.length === data.bill_dates.length) {
+                    // Clear existing options in the dropdowns
+                    $('#bill').empty();
+                    $('#bill_date').empty();
+    
+                    // Append bill numbers and dates to their respective dropdowns
+                    for (var i = 0; i < data.bill_numbers.length; i++) {
+                        var billNumber = data.bill_numbers[i];
+                        var billDate = data.bill_dates[i];
+    
+                        $('#bill').append($('<option>', {
+                            value: billNumber,
+                            text: billNumber
+                        }));
+    
+                        $('#bill_date').append($('<option>', {
+                            value: billDate,
+                            text: '{{ billDate|date:"d-m-Y" }}'
+                        }));
+                    }
+                    
+                    // Get the primary bill number and its date
+                    var primaryBillNo = data.bill_numbers[0];
+                    var primaryBillDate = data.bill_dates[0];
+    
+                    console.log("Primary Bill Date:", primaryBillDate);
+    
+                    // Check if primaryBillDate is not empty
+                    if (primaryBillDate !== undefined && primaryBillDate !== null && primaryBillDate !== "") {
+                        // Format the primary bill date using JavaScript
+                        var formattedPrimaryBillDate = new Date(primaryBillDate);
+                        console.log("Formatted Date:", formattedPrimaryBillDate);
+                        var formattedDate = (formattedPrimaryBillDate.getDate().toString().padStart(2, '0') + '-' + (formattedPrimaryBillDate.getMonth() + 1).toString().padStart(2, '0') + '-' + formattedPrimaryBillDate.getFullYear());
+                    } else {
+                        // If no bill dates available, set formattedDate to "NIL"
+                        var formattedDate = "NIL";
+                    }
+    
+                    // Set the primary bill number and its date as selected
+                    $('#bill').val(primaryBillNo);
+                    $('#bill_date').val(formattedDate);
+                } else {
+                    // If the lengths don't match or no data is available, add default options
+                    $('#bill').append($('<option>', {
+                        value: 'No bill',
+                        text: 'No bills available'
+                    }));
+                    $('#bill_date').append($('<option>', {
+                        value: 'No date',
+                        text: 'No dates available'
+                    }));
+                }
+            },
+            error: function () {
+                console.log("Error occurred while fetching bill numbers and dates.");
+            }
+        });
+    
+        // Check if there's an address associated with the selected party
+        var address = selectedOption.data("address");
+        var addressSection = $("#addressSection");
+        if (address && address.trim() !== "") {
+            // Display the address section
+            addressSection.show();
+        } else {
+            // Hide the address section
+            addressSection.hide();
+        }
+    }
+        
 </script>
 
 

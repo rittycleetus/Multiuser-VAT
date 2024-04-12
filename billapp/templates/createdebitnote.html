@@ -657,64 +657,40 @@
         $('#itm_type').val('Service');
     });
 });
-</script>
-
-
-<script>
-$(document).ready(function() {
-    // Event handler for form submission
-    $(document).on("click", "#itemcreate", function () {
-        // Get CSRF token from the DOM
-        var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
-
-        // Get item details from the form
-        var itemName = $('#itemName').val().trim();
-        var itemHSN = $('#itemHSN').val().trim();
-        var itemtype = $('#itm_type').val().trim();
-        var itemunit = $('#unit').val().trim();
-        var itemtaxable = $('#taxable_result').val().trim();
-        var itemtax1 = $('#item_tax_1').is(':checked') ? $('#item_tax_1').val() : '';
-        var itemtax2 = $('#item_tax_2').is(':checked') ? $('#item_tax_2').val() : '';
-        var vat1 = $('#vat1').val().trim();
-        var salesprice = $('#sal_price').val().trim();
-        var purprice = $('#pur_price').val().trim();
-        var openstock = $('#opn_stock_').val().trim();
-        var atprice = $('#at_price').val().trim();
-        var dateitem = $('#date').val().trim();
-
-        // Validate item name and HSN
-        if (itemName === '') {
-            alert('Please provide an item name');
-            return;
-        }
-        if (!validateHSN(itemHSN)) {
-            alert('Please provide a valid 6-digit HSN number.');
-            return;
-        }
-        
-        // Log the data being sent in the AJAX request
-        console.log({
-            itemName: itemName,
-            itemHSN: itemHSN,
-            itm_type: itemtype,
-            unit: itemunit,
-            taxable_result: itemtaxable,
-            tax1: itemtax1,
-            tax2: itemtax2,
-            vat1: vat1,
-            sal_price: salesprice,
-            pur_price: purprice,
-            opn_stock_: openstock,
-            at_price: atprice,
-            date: dateitem,
-            csrfmiddlewaretoken: csrfToken
-        });
-
-        // AJAX request
-        $.ajax({
-            type: 'POST',
-            url: "{% url 'item_create' %}",
-            data: {
+</script><script>
+    $(document).ready(function() {
+        // Event handler for form submission
+        $(document).on("click", "#itemcreate", function () {
+            // Get CSRF token from the DOM
+            var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
+    
+            // Get item details from the form
+            var itemName = $('#itemName').val().trim();
+            var itemHSN = $('#itemHSN').val().trim();
+            var itemtype = $('#itm_type').val().trim();
+            var itemunit = $('#unit').val().trim();
+            var itemtaxable = $('#taxable_result').val().trim();
+            var itemtax1 = $('#item_tax_1').is(':checked') ? $('#item_tax_1').val() : '';
+            var itemtax2 = $('#item_tax_2').is(':checked') ? $('#item_tax_2').val() : '';
+            var vat1 = $('#vat1').val().trim();
+            var salesprice = $('#sal_price').val().trim();
+            var purprice = $('#pur_price').val().trim();
+            var openstock = $('#opn_stock_').val().trim();
+            var atprice = $('#at_price').val().trim();
+            var dateitem = $('#date').val().trim();
+    
+            // Validate item name and HSN
+            if (itemName === '') {
+                alert('Please provide an item name');
+                return;
+            }
+            if (!validateHSN(itemHSN)) {
+                alert('Please provide a valid 6-digit HSN number.');
+                return;
+            }
+    
+            // Log the data being sent in the AJAX request
+            console.log({
                 itemName: itemName,
                 itemHSN: itemHSN,
                 itm_type: itemtype,
@@ -729,62 +705,80 @@ $(document).ready(function() {
                 at_price: atprice,
                 date: dateitem,
                 csrfmiddlewaretoken: csrfToken
-            },
-            success: function (response) {
-                alert('Item added successfully!');
-                 // Clear form fields
-                 $('#itemName, #itemHSN, #unit, #taxable_result, #vat1, #opn_stock_, #sal_price, #pur_price, #at_price, #date').val('');
-                
-                $('#itemCreateModal .btn-close').click();
-               
-                // $('#itemform')[0].reset();
-
-               
-                // Clear radio button selections
-                $('#goods, #service, #item_tax_1, #item_tax_2').prop('checked', false);
-
-                // Append the new item to the dropdown
-                $('#select1').append($('<option>', {
-                    value: response.item_id, 
-                    text: response.itemName 
-                }));
-
-                // Get the reference to the newly added option
-                var newOption = $('#select1 option[value="' + response.item_id + '"]');
-                console.log("Selected item:", newOption.val()); 
-
-                // Trigger the change event on the select element to ensure that the newly added item is selected
-                newOption.prop('selected', true).trigger('change');
-
-                // Call fillItemDetails1 with the newly added option
-                fillItemDetails1(newOption[0]);
-            },
-            error: function (xhr, errmsg, err) {
-                console.log('Error:', errmsg);
-            }
+            });
+    
+            // AJAX request
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'item_create' %}",
+                data: {
+                    itemName: itemName,
+                    itemHSN: itemHSN,
+                    itm_type: itemtype,
+                    unit: itemunit,
+                    taxable_result: itemtaxable,
+                    tax1: itemtax1,
+                    tax2: itemtax2,
+                    vat1: vat1,
+                    sal_price: salesprice,
+                    pur_price: purprice,
+                    opn_stock_: openstock,
+                    at_price: atprice,
+                    date: dateitem,
+                    csrfmiddlewaretoken: csrfToken
+                },
+                success: function (response) {
+                    alert('Item added successfully!');
+                    
+                    // Clear form fields
+                    $('#itemName, #itemHSN, #unit, #taxable_result, #vat1, #opn_stock_, #sal_price, #pur_price, #at_price, #date').val('');
+                    
+                    // Close modal
+                    $('#itemCreateModal .btn-close').click();
+    
+                    // Clear radio button selections
+                    $('#goods, #service, #item_tax_1, #item_tax_2').prop('checked', false);
+    
+                    // Append the new item to the dropdown
+                    $('#select1').append($('<option>', {
+                        value: response.item_id, 
+                        text: response.itemName 
+                    }));
+                 
+                    // Get the reference to the newly added option
+                    var newOption = $('#select1 option[value="' + response.item_id + '"]');
+                    console.log("Selected item:", newOption.val()); 
+    
+                    // Trigger the change event on the select element to ensure that the newly added item is selected
+                    newOption.prop('selected', true).trigger('change');
+    
+                    // Call fillItemDetails1 with the newly added option
+                    fillItemDetails1(newOption[0]);
+    
+                    // Append the new item to the dropdown in new rows
+                    $('.select2').append($('<option>', {
+                        value: response.item_id, 
+                        text: response.itemName 
+                    }));
+                },
+                error: function (xhr, errmsg, err) {
+                    alert('Failed to add item. Please try again.');
+                    console.log('Error:', errmsg);
+                }
+            });
         });
-    });
-
-    // Event listener for the 'select1' dropdown
-    $('#select1').on('change', function () {
-        // Get the selected option element
-        var selectedOption = this.options[this.selectedIndex];
-
-        // Call fillItemDetails1 with the selected option
-        fillItemDetails1(selectedOption);
-    });
-});
-
-
-            console.log(response);
-                        },
-            error: function (xhr, errmsg, err) {
-                console.log('Error:', errmsg);
-            }
+    
+        // Event listener for the 'select1' dropdown
+        $('#select1').on('change', function () {
+            // Get the selected option element
+            var selectedOption = this.options[this.selectedIndex];
+    
+            // Call fillItemDetails1 with the selected option
+            fillItemDetails1(selectedOption);
         });
-    });
-});
-function validateHSN(hsn) {
+    
+        // Function to validate HSN number
+        function validateHSN(hsn) {
             if (hsn.length !== 6) {
                 $('#hsnErrorMessage').text('Please provide a 6-digit HSN number.');
                 return false;
@@ -793,13 +787,13 @@ function validateHSN(hsn) {
                 return true;
             }
         }
+    });
 </script>
-
 
 
    <script>
     $(document).ready(function () {
-        // Function to validate HSN length
+      
        
     
 $("#unitmodalsubmit").click(function () {
@@ -1059,23 +1053,25 @@ $("#unitmodalsubmit").click(function () {
            }
        });
        function addToDropdown(data) {
-       // console.log(data.name,'gee');
-   
-       var dropdown = $('#party');
-   
-      
-       var option = $('<option>', {
-           value: data.id,
-           text: data.name
-   
-       });
-    //    option.attr('data-address', data.address);
-   
+    var dropdown = $('#party');
+    var option = $('<option>', {
+        value: data.id,
+        text: data.name
+    });
+    dropdown.append(option);
+  
+
+    $('#party').change(function() {
+        var selectedPartyId = $(this).val();
+        var selectedParty = response.parties.find(party => party.id == selectedPartyId);
+        if (selectedParty) {
+            $('#contact').val(selectedParty.contact);
+            $('#address1').val(selectedParty.address);
+            // Update other fields as needed
+        }
+    });
+}}
        
-       dropdown.append(option);
-       handlePartySelection();
-       }
-   }
        
 
 //    $.ajax({
@@ -1097,20 +1093,7 @@ $("#unitmodalsubmit").click(function () {
 //         addToDropdown(response.parties);
         
 //         // Update fields when party is selected
-//         $('#party').change(function() {
-//             var selectedPartyId = $(this).val();
-//             var selectedParty = response.parties.find(party => party.id == selectedPartyId);
-//             if (selectedParty) {
-//                 $('#contact').val(selectedParty.contact);
-//                 $('#address1').val(selectedParty.address);
-//                 // Update other fields as needed
-//             }
-//         });
-//     },
-//     error: function (error) {
-//         console.error('Error:', error);
-//     }
-// });
+      
 
 // function addToDropdown(parties) {
 //     var dropdown = $('#party');
@@ -1436,6 +1419,7 @@ handlePartySelection($('#party').find(':selected'));
 
 });
 </script>
+
 <script>
 $(document).ready(function () {
     // Event listener for the 'bill' dropdown
@@ -1465,113 +1449,125 @@ $(document).ready(function () {
     $('#party').trigger('change');
 });
 
+
 function handlePartySelection(selectedOption) {
-    var billDropdown = $("#bill");
-    var billDateDropdown = $("#bill_date");
+    // Check if selectedOption is defined
+    if (selectedOption) {
+        // AJAX request to fetch additional details for the selected party
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'additional_party_details' %}",
+            data: {
+                id: selectedOption.val(), // Pass the selected party ID
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function (data) {
+                 // Check if there's an address associated with the selected party
+        var address = selectedOption.data("address");
+        console.log("Selected party address:", address);
 
-    // Clear existing options in the bill and bill_date dropdowns
-    billDropdown.empty();
-    billDateDropdown.empty();
+        // Check if there's a balance associated with the selected party
+        var balance = selectedOption.data("openingbalance");
+        console.log("Selected party balance:", balance);
 
-    // Make an AJAX request to get bill numbers and dates for the selected party
-    $.ajax({
-        type: 'POST',
-        url: "{% url 'purchasebilldata' %}",
-        data: {
-            id: selectedOption.val(), // Pass the selected party ID
-            csrfmiddlewaretoken: '{{ csrf_token }}',
-        },
-        success: function (data) {
-    if (data.bill_numbers && data.bill_dates && data.bill_numbers.length === data.bill_dates.length) {
-        // Clear existing options in the dropdowns
-        $('#bill').empty();
-        $('#bill_date').empty();
+        // Check if there's a contact number associated with the selected party
+        var contact = selectedOption.data("contact");
+        console.log("Selected party contact:", contact);
+            },
+            error: function () {
+                console.log("Error occurred while fetching additional party details.");
+            }
+        });
 
-        // Append bill numbers and dates to their respective dropdowns
-        for (var i = 0; i < data.bill_numbers.length; i++) {
-            var billNumber = data.bill_numbers[i];
-            var billDate = data.bill_dates[i];
+        var billDropdown = $("#bill");
+        var billDateDropdown = $("#bill_date");
 
-            $('#bill').append($('<option>', {
-                value: billNumber,
-                text: billNumber
-            }));
+        // Clear existing options in the bill and bill_date dropdowns
+        billDropdown.empty();
+        billDateDropdown.empty();
 
-            $('#bill_date').append($('<option>', {
-                value: billDate,
-                text: '{{ billDate|date:"d-m-Y" }}'
-            }));
+        // Make an AJAX request to get bill numbers and dates for the selected party
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'purchasebilldata' %}",
+            data: {
+                id: selectedOption.val(), // Pass the selected party ID
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function (data) {
+                if (data.bill_numbers && data.bill_dates && data.bill_numbers.length === data.bill_dates.length) {
+                    // Clear existing options in the dropdowns
+                    $('#bill').empty();
+                    $('#bill_date').empty();
+
+                    // Append bill numbers and dates to their respective dropdowns
+                    for (var i = 0; i < data.bill_numbers.length; i++) {
+                        var billNumber = data.bill_numbers[i];
+                        var billDate = data.bill_dates[i];
+
+                        $('#bill').append($('<option>', {
+                            value: billNumber,
+                            text: billNumber
+                        }));
+
+                        $('#bill_date').append($('<option>', {
+                            value: billDate,
+                            text: '{{ billDate|date:"d-m-Y" }}'
+                        }));
+                    }
+
+                    // Get the primary bill number and its date
+                    var primaryBillNo = data.bill_numbers[0];
+                    var primaryBillDate = data.bill_dates[0];
+
+                    // Format the primary bill date using JavaScript
+                    var formattedDate = primaryBillDate ? new Date(primaryBillDate).toLocaleDateString('en-GB') : "NIL";
+
+                    // Set the primary bill number and its date as selected
+                    $('#bill').val(primaryBillNo);
+                    $('#bill_date').val(formattedDate);
+                } else {
+                    // If the lengths don't match or no data is available, add default options
+                    $('#bill').append($('<option>', {
+                        value: 'No bill',
+                        text: 'No bills available'
+                    }));
+                    $('#bill_date').append($('<option>', {
+                        value: 'No date',
+                        text: 'No dates available'
+                    }));
+                }
+            },
+            error: function () {
+                console.log("Error occurred while fetching bill numbers and dates.");
+            }
+        });
+
+        // Check if there's an address associated with the selected party
+        var address = selectedOption.data("address");
+        var addressSection = $("#addressSection");
+        if (address && address.trim() !== "") {
+            // Display the address section
+            addressSection.show();
+        } else {
+            // Hide the address section
+            addressSection.hide();
         }
-        
-        // Get the primary bill number and its date
-        var primaryBillNo = data.bill_numbers[0];
-        var primaryBillDate = data.bill_dates[0];
-
-        
-        console.log("Primary Bill Date:", primaryBillDate);
-
-// Check if primaryBillDate is not empty
-if (primaryBillDate !== undefined && primaryBillDate !== null && primaryBillDate !== "") {
-    // Format the primary bill date using JavaScript
-    var formattedPrimaryBillDate = new Date(primaryBillDate);
-    console.log("Formatted Date:", formattedPrimaryBillDate);
-    var formattedDate = (formattedPrimaryBillDate.getDate().toString().padStart(2, '0') + '-' + (formattedPrimaryBillDate.getMonth() + 1).toString().padStart(2, '0') + '-' + formattedPrimaryBillDate.getFullYear());
-} else {
-    // If no bill dates available, set formattedDate to "NIL"
-    var formattedDate = "NIL";
+    }
 }
 
-
-
-
-
-        // Set the primary bill number and its date as selected
-        $('#bill').val(primaryBillNo);
-        $('#bill_date').val(formattedDate);
-    } else {
-        // If the lengths don't match or no data is available, add default options
-        $('#bill').append($('<option>', {
-            value: 'No bill',
-            text: 'No bills available'
-        }));
-        $('#bill_date').append($('<option>', {
-            value: 'No date',
-            text: 'No dates available'
-        }));
-    }
-},
-        error: function () {
-            console.log("Error occurred while fetching bill numbers and dates.");
-        }
-    });
-
-    // Check if there's an address associated with the selected party
-    var address = selectedOption.data("address");
-    var addressSection = $("#addressSection");
-    if (address && address.trim() !== "") {
-        // Display the address section
-        addressSection.show();
-    } else {
-        // Hide the address section
-        addressSection.hide();
-    }
-}
 // Handle change event when a party is selected
 $('#party').change(function () {
     // Get the selected party option
     var selectedOption = $(this).find(':selected');
 
-    // Update the input fields with the data attributes of the selected party
-    $('#contact_number').val(selectedOption.data('contact'));
-    $('#address').val(selectedOption.data('address'));
-    $('#available_balance').val(selectedOption.data('openingbalance'));
-
     // Call the function to handle party selection
     handlePartySelection(selectedOption);
-
 });
+
 // Trigger party selection when the page loads initially
 $('#party').trigger('change');
+
 
 </script>
 
@@ -1593,6 +1589,7 @@ $('#party').trigger('change');
 
 
 <script>
+    
 function fillItemDetails1(selectElement) {
     console.log('Select element:', selectElement);
 
@@ -1663,6 +1660,8 @@ document.getElementById('adjustment').addEventListener('input', function () {
 
     });
 </script>
+
+
 <script>
     function addRow() {
         // Get the table body
@@ -1744,6 +1743,14 @@ document.getElementById('adjustment').addEventListener('input', function () {
 
     
     }
+    $('.select2').select2({
+        placeholder: 'Another Select Product',
+        allowClear: true,
+        width: '100%',
+    });
+
+    // Clear selection in the newly added dropdown
+    $('.select2').val(null).trigger('change');
 
     // Function to increment IDs and update the new row
     

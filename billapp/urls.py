@@ -127,6 +127,8 @@ urlpatterns = [
     path('share-debit-note-via-email/<int:debit_note_id>/', views.share_debit_note_via_email, name='share_debit_note_via_email'),
     
     
+
+    path('additional_party_details/',views.additional_party_details,name='additional_party_details'),
     re_path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),
 
 ]
