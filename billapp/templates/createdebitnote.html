@@ -1026,33 +1026,42 @@ $("#unitmodalsubmit").click(function () {
        
            
        $.ajax({
-           url: "{% url 'create_party' %}",
-           type: 'POST',
-           data: data,
-           processData: true,
-      
-          
-           success: function (response) {
-              console.log('New party created successfully!');
-              console.log('Success:', response);
-               
-               toastr.success('New party created successfully!');
-               // $('#createPartyModal').modal('hide');
-               
-               clearFormFields();
-               $('#close-btn').click();
-               console.log(response.parties);
-               
-               addToDropdown(response.parties);
-   
-              
-              
-           },
-           error: function (error) {
-               console.error('Error:', error);
-           }
-       });
-       function addToDropdown(data) {
+    url: "{% url 'create_party' %}",
+    type: 'POST',
+    data: data,
+    processData: true,
+    success: function (response) {
+        console.log('New party created successfully!');
+        console.log('Success:', response);
+        
+        toastr.success('New party created successfully!');
+        
+        // Assuming 'newParty' is part of the 'response' object returned from the AJAX request
+        var newParty = response.newParty;
+        
+        // Check if 'newParty' is defined before calling handleNewPartyCreation
+        if (newParty) {
+            handleNewPartyCreation(newParty);
+            
+            // Update the fields with the newly created party's details
+            $('#contact').val(newParty.contact);
+            $('#address').val(newParty.address);
+            $('#balance').val(newParty.openingbalance);
+        } else {
+            console.error("New party object is undefined.");
+        }
+        
+        clearFormFields();
+        $('#close-btn').click();
+        console.log(response.parties);
+        
+        addToDropdown(response.parties, response); // Pass the response object to addToDropdown
+    },
+    error: function (error) {
+        console.error('Error:', error);
+    }
+});
+       function addToDropdown(data,response) {
     var dropdown = $('#party');
     var option = $('<option>', {
         value: data.id,
@@ -1066,7 +1075,12 @@ $("#unitmodalsubmit").click(function () {
         var selectedParty = response.parties.find(party => party.id == selectedPartyId);
         if (selectedParty) {
             $('#contact').val(selectedParty.contact);
-            $('#address1').val(selectedParty.address);
+            $('#address').val(selectedParty.address);
+            $('#balance').val(selectedParty.openingbalance);
+            console.log(selectedParty.contact);
+            console.log(selectedParty.address);
+            console.log(selectedParty.openingbalance);
+            console.log("Hai")
             // Update other fields as needed
         }
     });
@@ -1448,10 +1462,7 @@ $(document).ready(function () {
     // Trigger party selection when the page loads initially
     $('#party').trigger('change');
 });
-
-
 function handlePartySelection(selectedOption) {
-    // Check if selectedOption is defined
     if (selectedOption) {
         // AJAX request to fetch additional details for the selected party
         $.ajax({
@@ -1462,17 +1473,11 @@ function handlePartySelection(selectedOption) {
                 csrfmiddlewaretoken: '{{ csrf_token }}',
             },
             success: function (data) {
-                 // Check if there's an address associated with the selected party
-        var address = selectedOption.data("address");
-        console.log("Selected party address:", address);
-
-        // Check if there's a balance associated with the selected party
-        var balance = selectedOption.data("openingbalance");
-        console.log("Selected party balance:", balance);
-
-        // Check if there's a contact number associated with the selected party
-        var contact = selectedOption.data("contact");
-        console.log("Selected party contact:", contact);
+                // Update the fields with the fetched party details
+                $('#contact_number').val(data.contact);
+                $('#address').val(data.address);
+                $('#balance').val(data.openingbalance);
+                console.log(data);
             },
             error: function () {
                 console.log("Error occurred while fetching additional party details.");
@@ -1554,6 +1559,26 @@ function handlePartySelection(selectedOption) {
             addressSection.hide();
         }
     }
+}
+// Function to handle the creation of a new party
+function handleNewPartyCreation(newParty) {
+    // Update the dropdown with the newly created party
+    var dropdown = $('#party');
+    var option = $('<option>', {
+        value: newParty.id,
+        text: newParty.name
+    });
+    dropdown.append(option);
+
+    // Update the fields with the new party's details
+    $('#contact_number').val(newParty.contact);
+    $('#address').val(newParty.address);
+    $('#balance').val(newParty.openingbalance);
+
+    // Log the values being assigned to the fields
+    console.log('New party contact:', newParty.contact);
+    console.log('New party address:', newParty.address);
+    console.log('New party opening balance:', newParty.openingbalance);
 }
 
 // Handle change event when a party is selected

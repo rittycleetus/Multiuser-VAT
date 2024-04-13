@@ -3031,9 +3031,8 @@ def get_bill_date(request):
 
     return JsonResponse({'bill_date': bill_date})
 
-
 def additional_party_details(request):
-    if request.method == 'POST' and request.is_ajax():
+    if request.method == 'POST' and request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
         party_id = request.POST.get('id')
         try:
             party = Party.objects.get(id=party_id)
@@ -3041,8 +3040,9 @@ def additional_party_details(request):
             data = {
                 'contact': party.contact,
                 'address': party.address,
-                'balance': party.balance,
+                'balance': party.openingbalance,
             }
+            print(data)
             return JsonResponse(data)
         except Party.DoesNotExist:
             return JsonResponse({'error': 'Party not found'}, status=404)
