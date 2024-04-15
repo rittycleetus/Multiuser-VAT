@@ -270,7 +270,7 @@
                     <br>
                     <div class="form-group" id="addressSection" >
                          <label for="address">Address</label>
-                        <textarea class="form-control" readonly id="address">{% if selected_party %}{{ selected_party.address }}{% endif %}</textarea>
+                        <textarea class="form-control" readonly id="addressa">{% if selected_party %}{{ selected_party.address }}{% endif %}</textarea>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -308,8 +308,7 @@
                         <label for="billdate">Bill Date</label>
                         <input type="text" class="form-control" id="bill_date" value="NIL" disabled style="background-color: white;">
                     </div>
-                    
-                    
+
                 </div>
                 </div>
                 <br><br><br>
@@ -657,7 +656,10 @@
         $('#itm_type').val('Service');
     });
 });
-</script><script>
+</script>
+
+
+<script>
     $(document).ready(function() {
         // Event handler for form submission
         $(document).on("click", "#itemcreate", function () {
@@ -744,39 +746,37 @@
                         value: response.item_id, 
                         text: response.itemName 
                     }));
-                 
                     // Get the reference to the newly added option
-                    var newOption = $('#select1 option[value="' + response.item_id + '"]');
-                    console.log("Selected item:", newOption.val()); 
-    
-                    // Trigger the change event on the select element to ensure that the newly added item is selected
-                    newOption.prop('selected', true).trigger('change');
-    
-                    // Call fillItemDetails1 with the newly added option
-                    fillItemDetails1(newOption[0]);
-    
-                    // Append the new item to the dropdown in new rows
-                    $('.select2').append($('<option>', {
-                        value: response.item_id, 
-                        text: response.itemName 
-                    }));
-                },
-                error: function (xhr, errmsg, err) {
-                    alert('Failed to add item. Please try again.');
-                    console.log('Error:', errmsg);
-                }
-            });
+                var newOption = $('#select1 option[value="' + response.item_id + '"]');
+                console.log("Selected item:", newOption.val()); 
+
+                // Trigger the change event on the select element to ensure that the newly added item is selected
+                newOption.prop('selected', true).trigger('change');
+
+                // AJAX request success, trigger the change event for select1
+                $('#select1').trigger('change');
+                
+                // Append the new item to the dropdown in new rows
+                $('.select2').append($('<option>', {
+                    value: response.item_id, 
+                    text: response.itemName 
+                }));
+            },
+            error: function (xhr, errmsg, err) {
+                alert('Failed to add item. Please try again.');
+                console.log('Error:', errmsg);
+            }
         });
-    
-        // Event listener for the 'select1' dropdown
-        $('#select1').on('change', function () {
-            // Get the selected option element
-            var selectedOption = this.options[this.selectedIndex];
-    
-            // Call fillItemDetails1 with the selected option
-            fillItemDetails1(selectedOption);
-        });
-    
+    });
+
+ 
+    $(document).on('change', '#select1', function () {
+        
+        var selectedOption = this.options[this.selectedIndex];
+
+        fillItemDetails1(selectedOption);
+    });
+
         // Function to validate HSN number
         function validateHSN(hsn) {
             if (hsn.length !== 6) {
@@ -1036,17 +1036,16 @@ $("#unitmodalsubmit").click(function () {
         
         toastr.success('New party created successfully!');
         
-        // Assuming 'newParty' is part of the 'response' object returned from the AJAX request
-        var newParty = response.newParty;
         
-        // Check if 'newParty' is defined before calling handleNewPartyCreation
+        var newParty = response.newParty;
+        console.log(newParty);
+        
         if (newParty) {
             handleNewPartyCreation(newParty);
             
-            // Update the fields with the newly created party's details
             $('#contact').val(newParty.contact);
-            $('#address').val(newParty.address);
-            $('#balance').val(newParty.openingbalance);
+            $('#addressa').val(newParty.address);
+            $('#available_balance').val(newParty.openingbalance);
         } else {
             console.error("New party object is undefined.");
         }
@@ -1055,36 +1054,50 @@ $("#unitmodalsubmit").click(function () {
         $('#close-btn').click();
         console.log(response.parties);
         
-        addToDropdown(response.parties, response); // Pass the response object to addToDropdown
+        addToDropdown(response.parties, response); 
     },
     error: function (error) {
         console.error('Error:', error);
     }
 });
-       function addToDropdown(data,response) {
+function addToDropdown(data, response) {
     var dropdown = $('#party');
     var option = $('<option>', {
         value: data.id,
         text: data.name
     });
     dropdown.append(option);
-  
 
     $('#party').change(function() {
         var selectedPartyId = $(this).val();
-        var selectedParty = response.parties.find(party => party.id == selectedPartyId);
-        if (selectedParty) {
-            $('#contact').val(selectedParty.contact);
-            $('#address').val(selectedParty.address);
-            $('#balance').val(selectedParty.openingbalance);
-            console.log(selectedParty.contact);
-            console.log(selectedParty.address);
-            console.log(selectedParty.openingbalance);
-            console.log("Hai")
-            // Update other fields as needed
+        if (!Array.isArray(response.parties)) {
+            response.parties = Array.from(response.parties);
+        }
+        console.log("Selected Party ID:", selectedPartyId);
+        console.log("All Parties in response:", response.parties);
+        // Check if response.parties is an array before using the find method
+        if (Array.isArray(response.parties)) {
+            var selectedParty = response.parties.find(party => party.id == selectedPartyId);
+            if (selectedParty) {
+                $('#contact').val(selectedParty.contact);
+                $('#addressa').val(selectedParty.address);
+                $('#available_balance').val(selectedParty.openingbalance);
+                console.log(selectedParty.contact);
+                console.log(selectedParty.address);
+                console.log(selectedParty.openingbalance);
+                console.log("Hai");
+            } else {
+                console.error("Selected party not found in response.parties.");
+            }
+        } else {
+            console.error("response.parties is not an array.");
         }
     });
-}}
+}
+    }
+
+    
+
        
        
 
@@ -1386,62 +1399,30 @@ $("#unitmodalsubmit").click(function () {
 </script>
 
 <script>
-
-
 $(document).ready(function () {
-    // Handle change event when a party is selected
+    // Event listener for party selection change
     $('#party').change(function () {
-        // Get the selected party option
         var selectedOption = $(this).find(':selected');
-        console.log(selectedOption);
-        // Check if a valid option is selected
-        if (selectedOption.length) {
-            // Update the input fields with the data attributes of the selected party
-            $('#contact_number').val(selectedOption.data('contact'));
-            $('#address').val(selectedOption.data('address'));
-            $('#available_balance').val(selectedOption.data('openingbalance'));
-
-            // Update the bill dropdown based on selected party
-            handlePartySelection(selectedOption);
-
-            // Check if it's a newly created party (just added)
-            if (selectedOption.data('isNewParty')) {
-                // If it's a newly created party, clear sessionStorage to prevent default values
-                sessionStorage.clear();
-            }
+        handlePartySelection(selectedOption);
+        if (selectedOption.data('isNewParty')) {
+            sessionStorage.clear(); // Clear session storage for new party
         }
     });
 
-// Check if the page has been loaded before
-var isFirstLoad = sessionStorage.getItem('isFirstLoad');
+    // Check if it's the first load or a reload
+    var isFirstLoad = sessionStorage.getItem('isFirstLoad');
+    if (!isFirstLoad) {
+        // Set default values for input fields
+        $('#contact_number, #addressa, #available_balance, #bill, #bill_date').val('');
+        sessionStorage.setItem('isFirstLoad', true); // Mark as first load
+    }
 
-// If it's the first load or the page is being reloaded, set the default values
-if (!isFirstLoad) {
-    // Set default values for the input fields
-    $('#contact_number').val('');
-    $('#address').val('');
-    $('#available_balance').val('');
-    $('#bill').val('');
-    $('#bill_date').val('');
+    // Trigger party selection when the page loads initially
+    $('#party').trigger('change');
 
-    // Indicate that the page has been loaded
-    sessionStorage.setItem('isFirstLoad', true);
-}
-
-// Trigger handlePartySelection on page load to handle default selection
-handlePartySelection($('#party').find(':selected'));
-
-});
-</script>
-
-<script>
-$(document).ready(function () {
-    // Event listener for the 'bill' dropdown
+    // Event listener for the 'bill' dropdown change
     $('#bill').on('change', function () {
         var selectedBillNo = $(this).val();
-        console.log(selectedBillNo);
-
-        // Make an AJAX request to get the date for the selected bill number
         $.ajax({
             type: 'POST',
             url: "{% url 'get_bill_date' %}",
@@ -1450,97 +1431,64 @@ $(document).ready(function () {
                 csrfmiddlewaretoken: '{{ csrf_token }}',
             },
             success: function (dateData) {
-                // Clear existing options in the 'bill_date' input field
-                $('#bill_date').val(dateData.bill_date);
+                $('#bill_date').val(dateData.bill_date); // Set bill date
             },
             error: function () {
                 console.log("Error occurred while fetching bill date.");
             }
         });
     });
-
-    // Trigger party selection when the page loads initially
-    $('#party').trigger('change');
 });
+
+// Function to handle party selection
 function handlePartySelection(selectedOption) {
     if (selectedOption) {
-        // AJAX request to fetch additional details for the selected party
         $.ajax({
             type: 'POST',
             url: "{% url 'additional_party_details' %}",
             data: {
-                id: selectedOption.val(), // Pass the selected party ID
+                id: selectedOption.val(),
                 csrfmiddlewaretoken: '{{ csrf_token }}',
             },
             success: function (data) {
-                // Update the fields with the fetched party details
                 $('#contact_number').val(data.contact);
-                $('#address').val(data.address);
-                $('#balance').val(data.openingbalance);
-                console.log(data);
+                $('#addressa').val(data.address);
+                $('#available_balance').val(data.balance);
             },
             error: function () {
                 console.log("Error occurred while fetching additional party details.");
             }
         });
 
+        // Populate bill dropdown
         var billDropdown = $("#bill");
         var billDateDropdown = $("#bill_date");
-
-        // Clear existing options in the bill and bill_date dropdowns
-        billDropdown.empty();
-        billDateDropdown.empty();
-
-        // Make an AJAX request to get bill numbers and dates for the selected party
+        // AJAX request to get bill numbers and dates for the selected party
         $.ajax({
             type: 'POST',
             url: "{% url 'purchasebilldata' %}",
             data: {
-                id: selectedOption.val(), // Pass the selected party ID
+                id: selectedOption.val(),
                 csrfmiddlewaretoken: '{{ csrf_token }}',
             },
             success: function (data) {
                 if (data.bill_numbers && data.bill_dates && data.bill_numbers.length === data.bill_dates.length) {
-                    // Clear existing options in the dropdowns
-                    $('#bill').empty();
-                    $('#bill_date').empty();
-
-                    // Append bill numbers and dates to their respective dropdowns
+                    billDropdown.empty();
+                    billDateDropdown.empty();
                     for (var i = 0; i < data.bill_numbers.length; i++) {
                         var billNumber = data.bill_numbers[i];
                         var billDate = data.bill_dates[i];
-
-                        $('#bill').append($('<option>', {
-                            value: billNumber,
-                            text: billNumber
-                        }));
-
-                        $('#bill_date').append($('<option>', {
-                            value: billDate,
-                            text: '{{ billDate|date:"d-m-Y" }}'
-                        }));
+                        billDropdown.append($('<option>', { value: billNumber, text: billNumber }));
+                        billDateDropdown.append($('<option>', { value: billDate, text: '{{ billDate|date:"d-m-Y" }}' }));
                     }
-
-                    // Get the primary bill number and its date
                     var primaryBillNo = data.bill_numbers[0];
                     var primaryBillDate = data.bill_dates[0];
-
-                    // Format the primary bill date using JavaScript
                     var formattedDate = primaryBillDate ? new Date(primaryBillDate).toLocaleDateString('en-GB') : "NIL";
-
-                    // Set the primary bill number and its date as selected
                     $('#bill').val(primaryBillNo);
                     $('#bill_date').val(formattedDate);
                 } else {
-                    // If the lengths don't match or no data is available, add default options
-                    $('#bill').append($('<option>', {
-                        value: 'No bill',
-                        text: 'No bills available'
-                    }));
-                    $('#bill_date').append($('<option>', {
-                        value: 'No date',
-                        text: 'No dates available'
-                    }));
+                    billDropdown.append($('<option>', { value: 'No bill', text: 'No bills available' }));
+                    billDateDropdown.append($('<option>', { value: 'No date', text: 'No dates available' }));
                 }
             },
             error: function () {
@@ -1548,39 +1496,31 @@ function handlePartySelection(selectedOption) {
             }
         });
 
-        // Check if there's an address associated with the selected party
+        // Show/hide address section
         var address = selectedOption.data("address");
         var addressSection = $("#addressSection");
-        if (address && address.trim() !== "") {
-            // Display the address section
-            addressSection.show();
+        var isNewParty = selectedOption.data("isNewParty");
+        if (isNewParty || (address && address.trim() !== "")) {
+            addressSection.show(); // Show address section
         } else {
-            // Hide the address section
-            addressSection.hide();
+            addressSection.hide(); // Hide address section
         }
     }
 }
+
 // Function to handle the creation of a new party
 function handleNewPartyCreation(newParty) {
-    // Update the dropdown with the newly created party
     var dropdown = $('#party');
-    var option = $('<option>', {
-        value: newParty.id,
-        text: newParty.name
-    });
+    var option = $('<option>', { value: newParty.id, text: newParty.name });
     dropdown.append(option);
-
-    // Update the fields with the new party's details
     $('#contact_number').val(newParty.contact);
-    $('#address').val(newParty.address);
-    $('#balance').val(newParty.openingbalance);
-
-    // Log the values being assigned to the fields
+    $('#addressa').val(newParty.address);
+    $('#available_balance').val(newParty.openingbalance);
+    $("#addressSection").show(); // Show the address section
     console.log('New party contact:', newParty.contact);
     console.log('New party address:', newParty.address);
     console.log('New party opening balance:', newParty.openingbalance);
 }
-
 // Handle change event when a party is selected
 $('#party').change(function () {
     // Get the selected party option
@@ -1614,17 +1554,25 @@ $('#party').trigger('change');
 
 
 <script>
-    
+
 function fillItemDetails1(selectElement) {
+    if (!selectElement || !selectElement.options) {
+        console.error('Invalid select element:', selectElement);
+        return;
+    }
+
     console.log('Select element:', selectElement);
 
     var selectedOption = selectElement.options[selectElement.selectedIndex];
+    if (!selectedOption) {
+        console.error('No selected option:', selectElement.selectedIndex);
+        return;
+    }
     console.log('Selected option:', selectedOption);
 
     var hsn = selectedOption.getAttribute("data-hsn") || "";
     var purchasePrice = selectedOption.getAttribute("data-price") || "";
     var vat = selectedOption.getAttribute("data-tax") || "";
-    var vatRate = parseFloat(vat.match(/\d+/)) || 0;
 
     console.log('HSN:', hsn);
     console.log('Purchase price:', purchasePrice);
@@ -1634,10 +1582,19 @@ function fillItemDetails1(selectElement) {
     console.log('Row:', row);
 
     if (row) {
-        row.querySelector('span[id="hsn"]').textContent = hsn;
-        row.querySelector('span[id="purchasePrice"]').textContent = purchasePrice;
-        row.querySelector('span[id="vat"]').textContent = vat;
-        updateTaxAmount();
+        var hsnElement = row.querySelector('span[id="hsn"]');
+        if (hsnElement) {
+            hsnElement.textContent = hsn;
+        }
+        var purchasePriceElement = row.querySelector('span[id="purchasePrice"]');
+        if (purchasePriceElement) {
+            purchasePriceElement.textContent = purchasePrice;
+        }
+        var vatElement = row.querySelector('span[id="vat"]');
+        if (vatElement) {
+            vatElement.textContent = vat;
+        }
+        updateTaxAmount(); // Make sure this function is defined and working correctly
     }
 }
     function updateTotalAmount1(inputElement) {
