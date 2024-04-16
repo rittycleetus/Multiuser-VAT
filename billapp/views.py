@@ -2418,7 +2418,7 @@ def extract_percentage(vat_string):
 
 
 
-def item_create(request):
+def item_create1(request):
     if request.method == 'POST':
         print('Request received')
 
@@ -2491,7 +2491,7 @@ def item_create(request):
 
 
 
-def create_unit(request):
+def create_unit1(request):
     if request.method == 'POST':
         unit_name = request.POST.get('unit_name', '')
         company_id = request.user.company.id
@@ -3048,3 +3048,43 @@ def additional_party_details(request):
             return JsonResponse({'error': 'Party not found'}, status=404)
     else:
         return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+def item_dropdown(request):
+    # Assuming you have a logged-in user and can get company and staff details from session
+    sid = request.session.get('staff_id')
+    staff = CustomUser.objects.get(id=sid)
+    cmp = Company.objects.get(id=staff.company.id)
+
+    # Fetch items based on company and user
+    products = Item.objects.filter(company=cmp, user=cmp.user)
+
+    # Create dictionaries for id and product list
+    id_list = []
+    product_list = []
+    items = {}
+    for product in products:
+        id_list.append(product.id)
+        product_list.append(product.item_name)
+        items[product.id] = [product.id, product.item_name]
+
+    # Print the items if you want
+    for item_id, item_details in items.items():
+        print(f"Item ID: {item_id}, Item Name: {item_details[1]}")
+
+    # Return JSON response with items
+    return JsonResponse(items)
+
+
+def item_details(request):
+    itmid = request.GET.get('id')
+    try:
+        itm = Item.objects.get(id=itmid)
+        hsn = itm.itm_hsn
+        vat = itm.itm_vat
+        price = itm.itm_purchase_price
+        qty = 0  
+        print(f"Item ID: {itm.id}, HSN: {hsn}, VAT: {vat}, Price: {price}, Quantity: {qty}")
+        return JsonResponse({'hsn': hsn, 'vat': vat, 'price': price, 'qty': qty})
+    except Item.DoesNotExist:
+        return JsonResponse({'error': 'Item not found'}, status=404)

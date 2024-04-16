@@ -108,8 +108,8 @@ urlpatterns = [
     path('createdebitnote',views.createdebitnote,name='createdebitnote'),
     path('create_party',views.create_party,name='create_party'), 
    
-    path('item_create',views.item_create,name='item_create'),
-    path('create_unit', views.create_unit, name='create_unit'),
+    path('item_create1',views.item_create1,name='item_create1'),
+    path('create_unit1', views.create_unit1, name='create_unit1'),
 
     path('save_debit_note', views.save_debit_note, name='save_debit_note'),
     path('purchasebilldata/',views.purchasebilldata,name='purchasebilldata'),
@@ -129,6 +129,9 @@ urlpatterns = [
     
 
     path('additional_party_details/',views.additional_party_details,name='additional_party_details'),
+    path('item_dropdown/', views.item_dropdown, name='item_dropdown'),
+    path(' item_details/',views. item_details,name=' item_details'),
+    
     re_path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),
 
 ]
