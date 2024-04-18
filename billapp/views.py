@@ -2468,7 +2468,7 @@ def item_create1(request):
         item = Item(
             user=request.user,
             company=request.user.company,
-            itm_type=itm_type,
+            itm_type=itm_type,  
             itm_name=itm_name,
             itm_hsn=itm_hsn,
             itm_unit=itm_unit,
@@ -2485,6 +2485,9 @@ def item_create1(request):
        
         response_data = {'success': True, 'message': 'Item created successfully!', 'item_id': item.id, 'itemName': item.itm_name}
         return JsonResponse(response_data)
+
+    # Render a response if not a POST request
+    return render(request, 'createdebitnote.html')
 
     # Render a response if not a POST request
     return render(request, 'createdebitnote.html')
@@ -3049,42 +3052,47 @@ def additional_party_details(request):
     else:
         return JsonResponse({'error': 'Invalid request'}, status=400)
 
+def get_item_dropdown(request):
+    if request.user.is_company:
+        cmp = request.user.company
+    else:
+        cmp = request.user.employee.company  
+    
+    options = {}
+    option_objects = Item.objects.filter(company=cmp)
+    
+    for option in option_objects:
+        options[option.id] = [option.id, option.itm_name, option.itm_hsn, option.itm_sale_price, option.itm_vat]
+       
+    return JsonResponse(options)
 
-def item_dropdown(request):
-    # Assuming you have a logged-in user and can get company and staff details from session
-    sid = request.session.get('staff_id')
-    staff = CustomUser.objects.get(id=sid)
-    cmp = Company.objects.get(id=staff.company.id)
-
-    # Fetch items based on company and user
-    products = Item.objects.filter(company=cmp, user=cmp.user)
-
-    # Create dictionaries for id and product list
-    id_list = []
-    product_list = []
-    items = {}
-    for product in products:
-        id_list.append(product.id)
-        product_list.append(product.item_name)
-        items[product.id] = [product.id, product.item_name]
-
-    # Print the items if you want
-    for item_id, item_details in items.items():
-        print(f"Item ID: {item_id}, Item Name: {item_details[1]}")
-
-    # Return JSON response with items
-    return JsonResponse(items)
-
+def fetch_item_details(request):
+    if request.user.is_company:
+        cmp = request.user.company
+    else:
+        cmp = request.user.employee.company
+        
+    item_id = request.POST.get('id')
+    item = Item.objects.get(pk=item_id, company=cmp)
+    
+    data = {
+        'hsn': item.itm_hsn,
+        'price': item.itm_sale_price,
+        'tax': item.itm_vat
+    }
+    return JsonResponse(data)
 
 def item_details(request):
-    itmid = request.GET.get('id')
-    try:
-        itm = Item.objects.get(id=itmid)
-        hsn = itm.itm_hsn
-        vat = itm.itm_vat
-        price = itm.itm_purchase_price
-        qty = 0  
-        print(f"Item ID: {itm.id}, HSN: {hsn}, VAT: {vat}, Price: {price}, Quantity: {qty}")
-        return JsonResponse({'hsn': hsn, 'vat': vat, 'price': price, 'qty': qty})
-    except Item.DoesNotExist:
-        return JsonResponse({'error': 'Item not found'}, status=404)
+    if request.user.is_company:
+        cmp = request.user.company
+    else:
+        cmp = request.user.employee.company  
+    
+    item_id = request.POST.get('id').split(" ")[0]
+    item = Item.objects.get(company=cmp, pk=item_id)
+    
+    hsn = item.itm_hsn
+    price = item.itm_sale_price
+    tax = item.itm_vat
+    
+    return JsonResponse({'hsn': hsn, 'price': price, 'tax': tax})

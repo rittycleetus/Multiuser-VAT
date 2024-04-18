@@ -81,7 +81,7 @@ WSGI_APPLICATION = "Multiusr_BillSoftware_Vat.wsgi.application"
 DATABASES = {
    'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'multiuser11-4',
+        'NAME': 'multiuser17-4',
         'USER':'root',
         'PASSWORD':'',
         'HOST':'localhost',

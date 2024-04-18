@@ -129,8 +129,9 @@ urlpatterns = [
     
 
     path('additional_party_details/',views.additional_party_details,name='additional_party_details'),
-    path('item_dropdown/', views.item_dropdown, name='item_dropdown'),
-    path(' item_details/',views. item_details,name=' item_details'),
+    path('get_item_dropdown/', views.get_item_dropdown, name='get_item_dropdown'),
+    path('item_details/',views.item_details,name='item_details'),
+    path('fetch_item_details/',views.fetch_item_details,name='fetch_item_details'),
     
     re_path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),
 

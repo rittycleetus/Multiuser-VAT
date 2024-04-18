@@ -642,181 +642,196 @@
         $('#vat1').val('VAT 0%');
         $('#taxable_result').val('Non Taxable');
     });
+     // Listen for click event on radio button with id 'goods'
+     $('#goods').click(function() {
+        // Set itm_type value to 'Goods'
+        $('#itm_type').val('Goods');
+    });
+    
+    // Listen for click event on radio button with id 'service'
+    $('#service').click(function() {
+        // Set itm_type value to 'Services'
+        $('#itm_type').val('Services');
+    });
     
 });
 </script>
 
 <script>
- $(document).ready(function() {
-    // Event handler for form submission
-    $(document).on("click", "#itemcreate", function () {
-        // Get CSRF token from the DOM
-        var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
+    $(document).ready(function() {
+       // Event handler for form submission
+       $(document).on("click", "#itemcreate", function () {
+           // Get CSRF token from the DOM
+           var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
+   
+           // Get item details from the form
+           var itemName = $('#itemName').val().trim();
+           var itemHSN = $('#itemHSN').val().trim();
+           var itemtype = $('#itm_type').val().trim();
+           var itemunit = $('#unit').val().trim();
+           var itemtaxable = $('#taxable_result').val().trim();
+           var itemtax1 = $('#item_tax_1').is(':checked') ? $('#item_tax_1').val() : '';
+           var itemtax2 = $('#item_tax_2').is(':checked') ? $('#item_tax_2').val() : '';
+           var vat1 = $('#vat1').val().trim();
+           var salesprice = $('#sal_price').val().trim();
+           var purprice = $('#pur_price').val().trim();
+           var openstock = $('#opn_stock_').val().trim();
+           var atprice = $('#at_price').val().trim();
+           var dateitem = $('#date').val().trim();
+   
+           // Validate item name and HSN
+           if (itemName === '') {
+               alert('Please provide an item name');
+               return;
+           }
+           if (!validateHSN(itemHSN)) {
+               alert('Please provide a valid 6-digit HSN number.');
+               return;
+           }
+   
+           // AJAX request
+           $.ajax({
+               type: 'POST',
+               url: "{% url 'item_create1' %}",
+               data: {
+                   itemName: itemName,
+                   itemHSN: itemHSN,
+                   itm_type: itemtype,
+                   unit: itemunit,
+                   taxable_result: itemtaxable,
+                   tax1: itemtax1,
+                   tax2: itemtax2,
+                   vat1: vat1,
+                   sal_price: salesprice,
+                   pur_price: purprice,
+                   opn_stock_: openstock,
+                   at_price: atprice,
+                   date: dateitem,
+                   csrfmiddlewaretoken: csrfToken
+               },
+               success: function (response) {
+                   alert('Item added successfully!');
+                   
+                   // Clear form fields
+                   $('#itemName, #itemHSN, #unit, #taxable_result, #vat1, #opn_stock_, #sal_price, #pur_price, #at_price, #date').val('');
+                   
+                   // Close modal
+                   $('#itemCreateModal .btn-close').click();
+                      // Clear radio button selections
+                   $('#goods, #service, #item_tax_1, #item_tax_2').prop('checked', false);
+                
+                   // Reload item dropdown
+                   reloadItem();
+               },
+               error: function(xhr, status, error) {
+                   console.error(xhr.responseText);
+               }
+           });
+       });
+   
+       // Function to reload item dropdown
+       function reloadItem() {
+           $.ajax({
+               url: "{% url 'get_item_dropdown' %}",
+               type: "GET",
+               dataType: "json",
+               success: function(data) {
+                   $('tr').each(function() {
+                       var row = $(this);
+                       var drop = row.find('select');
+                       var existingVal = drop.val();
+                       var optionExists = false;
+   
+                       drop.empty().append('<option disabled selected>Select Item</option>');
+                       $.each(data, function(key, value) {
+                           drop.append($('<option></option>').attr('value', key).text(value[1]).val(value[0] + " " + value[2] + " " + value[3] + " " + value[4]));
+                       });
+   
+                       if (optionExists) {
+                           drop.val(existingVal);
+                       }
+                   });
+               },
+               error: function(xhr, status, error) {
+                   console.error(xhr.responseText);
+               }
+           });
+       }
+   
+       // Function to validate HSN number
+       function validateHSN(hsn) {
+           if (hsn.length !== 6) {
+               $('#hsnErrorMessage').text('Please provide a 6-digit HSN number.');
+               return false;
+           } else {
+               $('#hsnErrorMessage').text('');
+               return true;
+           }
+       }
+   
+ // Event handler for change in item name
+ $(document).on('change', '[id^=item_name_]', function () {
+        var rowId = $(this).attr('id').split('_')[2]; // Extract the row number from the ID
+        var selectedId = $(this).val(); // Get the selected item ID
+        var itemId = selectedId.split(' ')[0];
 
-        // Get item details from the form
-        var itemName = $('#itemName').val().trim();
-        var itemHSN = $('#itemHSN').val().trim();
-        var itemtype = $('#itm_type').val().trim();
-        var itemunit = $('#unit').val().trim();
-        var itemtaxable = $('#taxable_result').val().trim();
-        var itemtax1 = $('#item_tax_1').is(':checked') ? $('#item_tax_1').val() : '';
-        var itemtax2 = $('#item_tax_2').is(':checked') ? $('#item_tax_2').val() : '';
-        var vat1 = $('#vat1').val().trim();
-        var salesprice = $('#sal_price').val().trim();
-        var purprice = $('#pur_price').val().trim();
-        var openstock = $('#opn_stock_').val().trim();
-        var atprice = $('#at_price').val().trim();
-        var dateitem = $('#date').val().trim();
-
-        // Validate item name and HSN
-        if (itemName === '') {
-            alert('Please provide an item name');
-            return;
-        }
-        if (!validateHSN(itemHSN)) {
-            alert('Please provide a valid 6-digit HSN number.');
-            return;
-        }
-
-        // Log the data being sent in the AJAX request
-        console.log({
-            itemName: itemName,
-            itemHSN: itemHSN,
-            itm_type: itemtype,
-            unit: itemunit,
-            taxable_result: itemtaxable,
-            tax1: itemtax1,
-            tax2: itemtax2,
-            vat1: vat1,
-            sal_price: salesprice,
-            pur_price: purprice,
-            opn_stock_: openstock,
-            at_price: atprice,
-            date: dateitem,
-            csrfmiddlewaretoken: csrfToken
-        });
-
-        // AJAX request
+        // Make an AJAX request to fetch the item details
         $.ajax({
-            type: 'POST',
-            url: "{% url 'item_create1' %}",
+            url: "{% url 'fetch_item_details' %}",
             data: {
-                itemName: itemName,
-                itemHSN: itemHSN,
-                itm_type: itemtype,
-                unit: itemunit,
-                taxable_result: itemtaxable,
-                tax1: itemtax1,
-                tax2: itemtax2,
-                vat1: vat1,
-                sal_price: salesprice,
-                pur_price: purprice,
-                opn_stock_: openstock,
-                at_price: atprice,
-                date: dateitem,
-                csrfmiddlewaretoken: csrfToken
+                id: itemId,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
             },
-            success: function (response) {
-                alert('Item added successfully!');
-                
-                // Clear form fields
-                $('#itemName, #itemHSN, #unit, #taxable_result, #vat1, #opn_stock_, #sal_price, #pur_price, #at_price, #date').val('');
-                
-                // Close modal
-                $('#itemCreateModal .btn-close').click();
-
-                // Clear radio button selections
-                $('#goods, #service, #item_tax_1, #item_tax_2').prop('checked', false);
-                
-                // Append the new item to the dropdown
-                $('#select1').append($('<option>', {
-                    value: response.item_id, 
-                    text: response.itemName,
-                    'data-hsn': response.itemHSN,
-                    'data-price': response.itemPrice, 
-                    'data-tax': response.itemTax 
-                })).val(response.item_id).trigger('change');
-                
-                // Get the reference to the newly added option
-                var newOption = $('#select1 option[value="' + response.item_id + '"]');
-                
-                // AJAX request to fetch item details
-                $.ajax({
-                    url: '/item_details/',
-                    method: 'GET',
-                    data: { item_id: newOption.val() },
-                    success: function(response) {
-                        // Update other elements with item details
-                        $('#item_name').val(response.name);
-                        $('#hsn_code').val(response.hsn);
-                        $('#tax_data').val(response.tax);
-                        $('#price').val(response.price);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error fetching item details:', error);
-                    }
-                });
-            },
-            error: function (xhr, errmsg, err) {
-                alert('Failed to add item. Please try again.');
-                console.log('Error:', errmsg);
+            type: 'POST',
+            success: function (data) {
+                // Update the corresponding input fields in the same row with fetched data
+                $('#hsn_' + rowId).val(data.hsn);
+                $('#price_' + rowId).val(data.price);
+                $('#tax_' + rowId).val(data.tax);
+                updateTaxAmount();
             }
         });
     });
 
-    // Function to validate HSN number
-    function validateHSN(hsn) {
-        if (hsn.length !== 6) {
-            $('#hsnErrorMessage').text('Please provide a 6-digit HSN number.');
-            return false;
-        } else {
-            $('#hsnErrorMessage').text('');
-            return true;
-        }
-    }
-    
-    function reloadItem() {
+    // Event handler for change in item name (alternative approach)
+    $("#select1").change(function(){
+        var selectedValue = $(this).val();
+        var itemId = selectedValue.split(' ')[0];
+        
         $.ajax({
-            url: "{% url 'item_dropdown' %}",
-            type: "GET",
-            dataType: "json",
-            data: {
+            url:"{% url 'item_details' %}",
+            data:{
+                id: selectedValue,
                 csrfmiddlewaretoken: '{{ csrf_token }}',
             },
+            type:'POST',
             success: function(data) {
-                // Find all table rows containing item data
-                $('.form-control.select2').each(function(index, selectElement) {
-                    var currentRow = $(selectElement).closest('tr');
-                    var currentItemID = $(selectElement).val();
-                    $(selectElement).empty();
-                    $(selectElement).append($('<option>', {
-                        value: '',
-                        text: 'Select Product'
-                    }));
-                    $.each(data, function(key, value) {
-                        var option = $('<option>', {
-                            value: value[0],
-                            text: value[1],
-                            'data-hsn': value[2],
-                            'data-price': value[3],
-                            'data-tax': value[4]
-                        });
-                        $(selectElement).append(option);
-                    });
-                    if (currentItemID !== "") {
-                        $(selectElement).val(currentItemID);
-                    }
-                });
-            },
-            error: function(xhr, status, error) {
-                console.error(xhr.responseText);
-            }
+                $('#hsn').text(data.hsn);
+                $('#purchasePrice').text(data.price);
+                $('#vat').text(data.tax);
+                updateTaxAmount();
+        }
+
         });
-    }
-    
-    // Call reloadItem function when the document is ready
-    reloadItem();
+    });
 });
+ // Event handler for change in quantity
+ $(document).on('change', '[id^=quantity_]', function() {
+        // Get the row ID
+        var rowId = $(this).attr('id').split('_')[1];
+        // Get the quantity value
+        var quantity = parseInt($(this).val());
+        // Get the price value for the same row
+        var price = parseFloat($('#price_' + rowId).val());
+        // Get the tax rate value for the same row
+        var taxRate = parseFloat($('#tax_' + rowId).val());
+        
+        // Calculate the tax amount
+        var taxAmount = quantity * price * (taxRate / 100);
+
+        // Update the tax amount field in the same row
+        $('#tax_amount_' + rowId).val(taxAmount.toFixed(2));
+    });
 </script>
 
 
@@ -1594,35 +1609,21 @@ function fillItemDetails1(selectElement) {
     var hsn = selectedOption.getAttribute("data-hsn") || "";
     var purchasePrice = selectedOption.getAttribute("data-price") || "";
     var vat = selectedOption.getAttribute("data-tax") || "";
+    var vatRate = parseFloat(vat.match(/\d+/)) || 0;
+
+    console.log('HSN:', hsn);
+    console.log('Purchase price:', purchasePrice);
+    console.log('VAT:', vat);
 
     var row = selectElement.closest('tr');
-    if (!row) {
-        console.error('Parent row not found for select element:', selectElement);
-        return;
-    }
+    console.log('Row:', row);
 
-    var hsnElement = row.querySelector('span[id="hsn"]');
-    if (!hsnElement) {
-        console.error('HSN element not found in row:', row);
-        return;
+    if (row) {
+        row.querySelector('span[id="hsn"]').textContent = hsn;
+        row.querySelector('span[id="purchasePrice"]').textContent = purchasePrice;
+        row.querySelector('span[id="vat"]').textContent = vat;
+        updateTaxAmount();
     }
-    hsnElement.textContent = hsn;
-
-    var purchasePriceElement = row.querySelector('span[id="purchasePrice"]');
-    if (!purchasePriceElement) {
-        console.error('Purchase price element not found in row:', row);
-        return;
-    }
-    purchasePriceElement.textContent = purchasePrice;
-
-    var vatElement = row.querySelector('span[id="vat"]');
-    if (!vatElement) {
-        console.error('VAT element not found in row:', row);
-        return;
-    }
-    vatElement.textContent = vat;
-
-    updateTaxAmount(); 
 }
 // Function to validate HSN number
 function validateHSN(hsn) {
@@ -1664,7 +1665,27 @@ $(document).ready(function() {
     $('.#select1').val(null).trigger('change');
 });
 </script>
+<script>
+    $(document).ready(function() {
+    $('.select2').on('change', function() {
+        var selectedOption = $(this).find('option:selected');
 
+        var hsn = selectedOption.data('hsn') || "";
+        var purchasePrice = selectedOption.data('price') || "";
+        var vat = selectedOption.data('tax') || "";
+
+        $('#hsn').text(hsn);
+        $('#purchasePrice').text(purchasePrice);
+        $('#vat').text(vat);
+
+        console.log('Selected item:', selectedOption.val());
+        console.log('HSN:', hsn);
+        console.log('Purchase price:', purchasePrice);
+        console.log('VAT:', vat);
+        fillItemDetails(selectedOption);
+    });
+});
+</script>
 
 <script>
     function addRow() {
@@ -1919,6 +1940,7 @@ function updateTaxAmount() {
 
         var rowTaxAmount = (quantity * price - discount) * (itmVat / 100);
         taxAmount += rowTaxAmount;
+        $('#tax_amount_' + rowId).val(taxAmount.toFixed(2));
     });
 
     document.getElementById('taxAmount').value = taxAmount.toFixed(2);
