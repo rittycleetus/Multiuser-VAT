@@ -1351,19 +1351,29 @@
         $('#party').trigger('change');
     });
 </script>
-<script>
-    function handlePartySelection(selectedOption) {
-
+<script> 
+function handlePartySelection(selectedOption) {
         var address = selectedOption.data("address");
-        var addressSection = $("#partyAddressGroup");
-        var billDropdown = $("#bill");
-        var billDateDropdown = $("#bill_date");
-    
+        var partyAddressGroup = $("#partyAddressGroup");
+        var partyAddressInput = $("#party_address");
 
-        $('#party_address').val(address);
+        console.log("Address:", address); // Check the retrieved address in the console
+
+        // Update the value of the party address input field
+        partyAddressInput.val(address);
+
+        // Check if the party has an address
+        if (address && address.trim() !== "") {
+            // Display the address section
+            partyAddressGroup.show();
+        } else {
+            // Hide the address section
+            partyAddressGroup.hide();
+        }
+
         // Clear existing options in the bill and bill_date dropdowns
-        billDropdown.empty();
-        billDateDropdown.empty();
+        $('#bill').empty();
+        $('#bill_date').empty();
     
         // Make an AJAX request to get bill numbers and dates for the selected party
         $.ajax({
@@ -1375,10 +1385,6 @@
             },
             success: function (data) {
                 if (data.bill_numbers && data.bill_dates && data.bill_numbers.length === data.bill_dates.length) {
-                    // Clear existing options in the dropdowns
-                    $('#bill').empty();
-                    $('#bill_date').empty();
-    
                     // Append bill numbers and dates to their respective dropdowns
                     for (var i = 0; i < data.bill_numbers.length; i++) {
                         var billNumber = data.bill_numbers[i];
@@ -1431,22 +1437,8 @@
                 console.log("Error occurred while fetching bill numbers and dates.");
             }
         });
-    
-        // Check if there's an address associated with the selected party
-        var address = selectedOption.data("address");
-        var addressSection = $("#addressSection");
-        if (address && address.trim() !== "") {
-            // Display the address section
-            addressSection.show();
-        } else {
-            // Hide the address section
-            addressSection.hide();
-        }
     }
-        
 </script>
-
-
 
 
 <script>

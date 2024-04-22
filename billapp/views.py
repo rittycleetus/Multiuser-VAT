@@ -3099,12 +3099,14 @@ def item_details(request):
 
 
 
+
 def check_hsn_number_existsdebit(request):
     if request.user.is_company:
         cmp = request.user.company
     else:
         cmp = request.user.employee.company  
+    usr = CustomUser.objects.get(username=request.user)
     hsn = request.GET.get('hsn')
-    if Item.objects.filter(itm_hsn=hsn, company=cmp).exists():
+    if Item.objects.filter(itm_hsn=hsn,company=cmp).exists():
         return JsonResponse({'exists': True})
     return JsonResponse({'exists': False})
