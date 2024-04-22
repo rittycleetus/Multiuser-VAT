@@ -132,6 +132,9 @@ urlpatterns = [
     path('get_item_dropdown/', views.get_item_dropdown, name='get_item_dropdown'),
     path('item_details/',views.item_details,name='item_details'),
     path('fetch_item_details/',views.fetch_item_details,name='fetch_item_details'),
+
+    path('check_hsn_number_existsdebit', views.check_hsn_number_existsdebit, name='check_hsn_number_existsdebit'),
+ 
     
     re_path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),
 

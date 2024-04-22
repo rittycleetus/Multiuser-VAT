@@ -200,6 +200,7 @@
 </style>
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
@@ -252,10 +253,14 @@
  
 
                         </select>
+                        
                             <div class="input-group-append">
                                 <button type="button" class="btn btn-outline-secondary" style="background-color: maroon;" data-toggle="modal" data-target="#createPartyModal">+</button>
                             </div>
+                            
                         </div>
+                        <div>
+                            <span id="partyError" class="text-danger" style="color: red;"></span></div>
                     </div>
                     <br>
                     <div class="form-group">
@@ -313,6 +318,7 @@
                 </div>
                 <br><br><br>
                 <div style="overflow-x:auto;">  
+                   
                     <table class="table table-hover  mt-5 " style="background-color: white;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
                         <thead style="background: #68020F;">
                           <tr class="text-center text-light" style="font-size: 12px;">
@@ -339,7 +345,7 @@
                                             <option value="{{ item.id }}" data-hsn="{{ item.itm_hsn }}" data-price="{{ item.itm_purchase_price }}" data-tax="VAT {{ item.itm_vat|floatformat:0 }}%">{{ item.itm_name }}</option>
                                         {% endfor %}
                                     </select>
-                            
+                                    
                         &nbsp;&nbsp; &nbsp;&nbsp;                        &nbsp;&nbsp; &nbsp;&nbsp;
                                     <!-- "+" button -->
                                  <a href="#" class="btn btn-outline-secondary" style="background-color: maroon; height: 40px; width: 30px; text-align: center; padding: 2px; position: absolute; right: 0; font-size: 20px; margin-left: 280px;" data-toggle="modal" data-target="#itemCreateModal"><b>+</b></a>
@@ -363,6 +369,9 @@
                      
                     </tbody>
                     </table>
+                    <div>
+                        <span id="itemError" class="text-danger" style="color: red;"></span>
+                    </div>
                     <!-- + button to add a new row -->
                     <button type="button" onclick="addRow()" class="btn btn-outline-secondary" style="background-color: maroon; height: 40px; width: 45px; text-align: center; padding: 2px;font-size: 20px;"><b>+</b></button>
                 </div>
@@ -501,11 +510,24 @@
 
                                     <div class="d-flex mt-2">
                                         <div class=" me-3 w-50">
-                                            <label class="fw-bold tb fs-3 " for="">HSN </label><br>
-                                            <input style="color: black;" class="form-control mt-2 input_border text-black" type="number" placeholder="Enter HSN value" name="hsn" id="itemHSN">
-                                            <span id="hsnErrorMessage" style="color: red;"></span>
-                                        </div>
-                                           <br>
+                                            <label class="fw-bold tb fs-3 " for="itemHSN">HSN </label><br>
+                                            <input style="color: black;" class="form-control mt-2 input_border text-black" type="number" placeholder="Enter HSN value" name="hsn" id="itemHSN" onblur="validateHSN(this);">
+                                            <span id="hsn-validation" style="position: absolute; right: 14px; top: 8px;"></span>
+                                            <div class="text-danger m-2" id="hsnErrorMessage"></div>
+                                            <label id="hsnerror" style="color: red;"></label>
+                                            
+                                          </div>
+                                          
+
+
+
+
+
+
+
+
+                                          
+                                                                 <br>
                                            <div class="mb-3 w-50">
                                                <label class="fw-bold tb fs-3" for="units">UNIT</label><br>
                                                <div class="d-flex">
@@ -722,6 +744,7 @@
                 
                    // Reload item dropdown
                    reloadItem();
+                   fillItemDetails1(selectElement);
                },
                error: function(xhr, status, error) {
                    console.error(xhr.responseText);
@@ -731,44 +754,74 @@
    
        // Function to reload item dropdown
        function reloadItem() {
-           $.ajax({
-               url: "{% url 'get_item_dropdown' %}",
-               type: "GET",
-               dataType: "json",
-               success: function(data) {
-                   $('tr').each(function() {
-                       var row = $(this);
-                       var drop = row.find('select');
-                       var existingVal = drop.val();
-                       var optionExists = false;
-   
-                       drop.empty().append('<option disabled selected>Select Item</option>');
-                       $.each(data, function(key, value) {
-                           drop.append($('<option></option>').attr('value', key).text(value[1]).val(value[0] + " " + value[2] + " " + value[3] + " " + value[4]));
-                       });
-   
-                       if (optionExists) {
-                           drop.val(existingVal);
-                       }
-                   });
-               },
-               error: function(xhr, status, error) {
-                   console.error(xhr.responseText);
-               }
-           });
-       }
-   
-       // Function to validate HSN number
-       function validateHSN(hsn) {
-           if (hsn.length !== 6) {
-               $('#hsnErrorMessage').text('Please provide a 6-digit HSN number.');
-               return false;
-           } else {
-               $('#hsnErrorMessage').text('');
-               return true;
-           }
-       }
-   
+    $.ajax({
+        url: "{% url 'get_item_dropdown' %}",
+        type: "GET",
+        dataType: "json",
+        success: function(data) {
+            $('tr').each(function() {
+                var row = $(this);
+                var drop = row.find('.select2');
+                var existingVal = drop.val();
+                var optionExists = false;
+                console.log(data);
+                drop.empty().append('<option disabled selected>Select Item</option>');
+                $.each(data, function(key, value) {
+                    drop.append($('<option></option>').attr('value', value[0]).attr('data-hsn', value[2]).attr('data-price', value[3]). attr('data-tax', value[4]).text(value[1]));
+                });
+
+                // 0: 17
+                //                 ​​
+                //                 1: "Tomato"
+                //                 ​​
+                //                 2: 444456
+                //                 ​​
+                //                 3: 424
+                //                 ​​
+                //                 4: "5"
+                //                 ​​
+                //                 length: 5
+
+                if (optionExists) {
+                    drop.val(existingVal);
+                }
+            });
+        },
+        error: function(xhr, status, error) {
+            console.error(xhr.responseText);
+        }
+    });
+}
+   // Function to validate HSN number
+function validateHSN(hsn) {
+    if (hsn.length !== 6) {
+        $('#hsnErrorMessage').text('Please provide a 6-digit HSN number.');
+        return false;
+    } else {
+        $('#hsnErrorMessage').text('');
+        return true;
+    }
+}
+
+$(document).ready(function() {
+    $('#itemHSN').blur(function() {
+        var hsn = $(this).val();
+        $.ajax({
+            url: 'check_hsn_number_existsdebit',
+            data: {
+                'hsn': hsn
+            },
+            dataType: 'json',
+            success: function(data) {
+                if (data.exists) {
+                    $('#hsnerror').text('HSN number already exists!');
+                } else {
+                    $('#hsnerror').text('');
+                }
+            }
+        });
+    });
+});
  // Event handler for change in item name
  $(document).on('change', '[id^=item_name_]', function () {
         var rowId = $(this).attr('id').split('_')[2]; // Extract the row number from the ID
@@ -815,21 +868,21 @@
         });
     });
 });
- // Event handler for change in quantity
+
  $(document).on('change', '[id^=quantity_]', function() {
-        // Get the row ID
+        
         var rowId = $(this).attr('id').split('_')[1];
-        // Get the quantity value
+        
         var quantity = parseInt($(this).val());
-        // Get the price value for the same row
+        
         var price = parseFloat($('#price_' + rowId).val());
-        // Get the tax rate value for the same row
+        
         var taxRate = parseFloat($('#tax_' + rowId).val());
         
-        // Calculate the tax amount
+      
         var taxAmount = quantity * price * (taxRate / 100);
 
-        // Update the tax amount field in the same row
+        
         $('#tax_amount_' + rowId).val(taxAmount.toFixed(2));
     });
 </script>
@@ -936,10 +989,11 @@ $("#unitmodalsubmit").click(function () {
                                    <input type="text" style="background-color: white;" class="form-control" id="partyname" name="partyname" placeholder="Party Name" required>
                                </div>                
                                <div class="col-md-4" style="position: relative;">
-                                   <input type="text" style="background-color: white;" class="form-control" id="trn_no" name="trn_no" placeholder="TRN NO" oninput="validateGSTIN(this)">
-                                   <span id="gstno-validation" style="position: absolute; right: 14px; top: 8px;"></span>
-                                   <label style="color: rgb(101, 3, 3);">* 32AAQFR1222B1ZS</label>
-                               </div>
+                                <input required type="text" style="background-color: white;" class="form-control" id="trn_no" name="trn_no" placeholder="TRN NO" oninput="validateGSTIN(this)">
+                                <span id="gstno-validation" style="position: absolute; right: 14px; top: 8px;"></span>
+                                <label id="trn_no_error" style="color: red;"></label>
+                                <label style="color: rgb(101, 3, 3);">* 32AAQFR1222B1ZS</label>
+                            </div>
                                
                                <div class="col-md-4" style="position: relative;">
                                    <input required type="number" style="background-color: white;" class="form-control" id="contact" pattern="[0-9]{10}" name="contact" placeholder="Phone Number" oninput="validatePhoneNumber(this)">
@@ -1086,7 +1140,7 @@ $("#unitmodalsubmit").click(function () {
         
         if (newParty) {
             handleNewPartyCreation(newParty);
-            
+            console.log("hai");
             $('#contact').val(newParty.contact);
             $('#addressa').val(newParty.address);
             $('#available_balance').val(newParty.openingbalance);
@@ -1113,6 +1167,7 @@ function addToDropdown(data, response) {
     dropdown.append(option);
 
     $('#party').change(function() {
+        console.log("koo");
         var selectedPartyId = $(this).val();
         if (!Array.isArray(response.parties)) {
             response.parties = Array.from(response.parties);
@@ -1129,7 +1184,7 @@ function addToDropdown(data, response) {
                 console.log(selectedParty.contact);
                 console.log(selectedParty.address);
                 console.log(selectedParty.openingbalance);
-                console.log("Hai");
+               
             } else {
                 console.error("Selected party not found in response.parties.");
             }
@@ -1305,27 +1360,50 @@ function addToDropdown(data, response) {
                     validationSpan.innerHTML = "&#10060;"; // Cross mark symbol
                     validationSpan.style.color = "red";
                 }
-            }
-            
-            function validateGSTIN(inputElement) {
-                const gstin = inputElement.value;
-                const validationSpan = document.getElementById("gstno-validation");
-            
-                // Regular expression to check for a valid GSTIN pattern
-                const regex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9][A-Z][A-Z0-9]$/;
-            
-                if (regex.test(gstin)) {
-                    // Valid GSTIN format, display a checkmark
-                    validationSpan.innerHTML = "&#10004;"; // Checkmark symbol
-                    validationSpan.style.color = "green";
-                } else {
-                    // Not a valid GSTIN format, display a cross mark
-                    validationSpan.innerHTML = "&#10060;"; // Cross mark symbol
-                    validationSpan.style.color = "red";
-                }
-            }
-            
+            } 
             </script>
+            
+            <script>
+    function validateGSTIN(inputElement) {
+        const gstin = inputElement.value;
+        const validationSpan = document.getElementById("gstno-validation");
+
+        // Regular expression to check for a valid GSTIN pattern
+        const regex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9][A-Z][A-Z0-9]$/;
+
+        if (regex.test(gstin)) {
+            // Valid GSTIN format, display a checkmark
+            validationSpan.innerHTML = "&#10004;"; // Checkmark symbol
+            validationSpan.style.color = "green";
+        } else {
+            // Not a valid GSTIN format, display a cross mark
+            validationSpan.innerHTML = "&#10060;"; // Cross mark symbol
+            validationSpan.style.color = "red";
+        }
+    }
+
+    $(document).ready(function() {
+        $('#trn_no').blur(function() {
+            var trn_no = $(this).val();
+            var trn_type = $('#trn_type').val();
+            $.ajax({
+                url: 'check_trn_no_exists',
+                data: {
+                    'trn_no': trn_no,
+                    'trn_type': trn_type
+                },
+                dataType: 'json',
+                success: function(data) {
+                    if (data.exists) {
+                        $('#trn_no_error').text('TRN number already exists!');
+                    } else {
+                        $('#trn_no_error').text('');
+                    }
+                }
+            });
+        });
+    });
+</script>
            <script>
             // Function to format the date as "YYYY-MM-DD"
             function formatDate(date) {
@@ -1389,6 +1467,27 @@ $(document).ready(function() {
     });
 });
 </script>
+<script>
+    $(document).ready(function() {
+        $('#select2').on('change', function() {
+            var selectedOption = $(this).find('option:selected');
+    
+            var hsn = selectedOption.data('hsn') || "";
+            var purchasePrice = selectedOption.data('price') || "";
+            var vat = selectedOption.data('tax') || "";
+    
+            $('#hsn').text(hsn);
+            $('#purchasePrice').text(purchasePrice);
+            $('#vat').text(vat);
+    
+            console.log('Selected item:', selectedOption.val());
+            console.log('HSN:', hsn);
+            console.log('Purchase price:', purchasePrice);
+            console.log('VAT:', vat);
+            fillItemDetails(selectElement);
+        });
+    });
+    </script>
 <script>
     window.onload = function() {
         // Get the value of count dynamically
@@ -1485,6 +1584,20 @@ $(document).ready(function () {
 // Function to handle party selection
 function handlePartySelection(selectedOption) {
     if (selectedOption) {
+        // Check if there's an address associated with the selected party
+        var address = selectedOption.data("addressa");
+        var addressSection = $("#addressSection");
+
+        console.log("Address:", address); // Check the retrieved address in the console
+        
+        if (address && address.trim() !== "") {
+            // Display the address section
+            addressSection.show();
+        } else {
+            // Hide the address section
+            addressSection.hide();
+        }
+
         $.ajax({
             type: 'POST',
             url: "{% url 'additional_party_details' %}",
@@ -1493,15 +1606,63 @@ function handlePartySelection(selectedOption) {
                 csrfmiddlewaretoken: '{{ csrf_token }}',
             },
             success: function (data) {
+                console.log("AJAX success - Address from server:", data.address); // Debugging
                 $('#contact_number').val(data.contact);
                 $('#addressa').val(data.address);
-                $('#available_balance').val(data.balance);
+                $('#available_balance').val(data.balance); // Show/hide address section based on data.address
+                if (data.address && data.address.trim() !== "") {
+                    addressSection.show();
+                } else {
+                    addressSection.hide();
+                }
+            
             },
             error: function () {
                 console.log("Error occurred while fetching additional party details.");
             }
         });
+        // Function to validate party selection
+function validatePartySelection() {
+    var partyDropdown = $('#party');
+    var selectedParty = partyDropdown.val();
+    if (!selectedParty) {
+        $('#partyError').text("Please select a party");
+        return false; // Prevent form submission
+    } else {
+        $('#partyError').text(""); // Clear error message if party is selected
+        handlePartySelection(); // Call the function to fetch additional party details
+        return true; // Allow form submission
+    }
+}
 
+// Form submission handler
+$('form').submit(function() {
+    // Validate party selection
+    return validatePartySelection();
+});
+// Function to validate item selection
+function validateItemSelection() {
+    var selectedItem = $('#select1').val();
+    if (!selectedItem) {
+        $('#itemError').text("Please select an item");
+        return false; // Prevent form submission
+    } else {
+        $('#itemError').text(""); // Clear error message if item is selected
+        return true; // Allow form submission
+    }
+}
+
+// Form submission handler
+$('form').submit(function() {
+    // Validate party selection
+    var isPartySelected = handlePartySelection();
+    
+    // Validate item selection
+    var isItemSelected = validateItemSelection();
+    
+    // Allow form submission only if both party and item are selected
+    return isPartySelected && isItemSelected;
+});
         // Populate bill dropdown
         var billDropdown = $("#bill");
         var billDateDropdown = $("#bill_date");
@@ -1538,27 +1699,28 @@ function handlePartySelection(selectedOption) {
             }
         });
 
-        // Show/hide address section
-        var address = selectedOption.data("address");
-        var addressSection = $("#addressSection");
-        var isNewParty = selectedOption.data("isNewParty");
-        if (isNewParty || (address && address.trim() !== "")) {
-            addressSection.show(); // Show address section
-        } else {
-            addressSection.hide(); // Hide address section
-        }
     }
 }
 
 // Function to handle the creation of a new party
 function handleNewPartyCreation(newParty) {
-    var dropdown = $('#party');
-    var option = $('<option>', { value: newParty.id, text: newParty.name });
+    var dropdown = $('#party')
+    var option = $('<option>', { 
+    value: newParty.id, 
+    text: newParty.name, 
+    'data-contact': newParty.contact, 
+    'data-address': newParty.address, 
+    'data-openingbalance': newParty.openingbalance
+});
     dropdown.append(option);
     $('#contact_number').val(newParty.contact);
     $('#addressa').val(newParty.address);
     $('#available_balance').val(newParty.openingbalance);
-    $("#addressSection").show(); // Show the address section
+    
+    // Show the address section and update the address textarea
+    $("#addressSection").show(); 
+    $('#addressa').val(newParty.address);
+    
     console.log('New party contact:', newParty.contact);
     console.log('New party address:', newParty.address);
     console.log('New party opening balance:', newParty.openingbalance);
@@ -1625,17 +1787,7 @@ function fillItemDetails1(selectElement) {
         updateTaxAmount();
     }
 }
-// Function to validate HSN number
-function validateHSN(hsn) {
-    if (hsn.length !== 6) {
-        $('#hsnErrorMessage').text('Please provide a 6-digit HSN number.');
-        return false;
-    } else {
-        $('#hsnErrorMessage').text('');
-        return true;
-    }
-}
-
+ 
 // Function to update total amount based on input changes
 function updateTotalAmount1(inputElement) {
     var row = inputElement.closest('tr');
@@ -1687,113 +1839,107 @@ $(document).ready(function() {
 });
 </script>
 
-<script>
-    function addRow() {
-        // Get the table body
-        var tableBody = document.querySelector('.table tbody');
+<script>function addRow() {
+    // Get the table body
+    var tableBody = document.querySelector('.table tbody');
 
-        // Create a new row
-        var newRow = tableBody.insertRow();
-        newRow.classList.add('new-row')
+    // Create a new row
+    var newRow = tableBody.insertRow();
+    newRow.classList.add('new-row');
 
-        
-        // Cell 1: Counter
-        var cell1 = newRow.insertCell(0);
-        cell1.innerHTML = tableBody.rows.length; // Set the row number
+    // Cell 1: Counter
+    var cell1 = newRow.insertCell(0);
+    cell1.innerHTML = tableBody.rows.length; // Set the row number
 
-        // Cell 2: Product Dropdown
-        var cell2 = newRow.insertCell(1);
-        cell2.innerHTML = '<div style="display: flex; position: relative;">' +
-            '<select name="selected_item[]" onchange="fillItemDetails(this, this.parentNode.parentNode)" style="width: 120px;" class="form-control select2" id="select1">' +
-            '<option value="">-Select-</option>' +
-            '{% for item in items %}' +
-            '<option value="{{ item.id }}" data-hsn="{{ item.itm_hsn }}" data-price="{{ item.itm_purchase_price }}" data-tax="VAT {{ item.itm_vat|floatformat:0 }}%">{{ item.itm_name }}</option>' +
-            '{% endfor %}' +
-            '</select>' +
-            '<a href="#" class="btn btn-outline-secondary" style="background-color: maroon; height: 40px; width: 30px; text-align: center; padding: 2px; position: absolute; right: 0; font-size: 20px; margin-left: 280px;" data-toggle="modal" data-target="#itemCreateModal"><b>+</b></a>'+
-            '</div>';
+    var select=document.getElementById('select1').innerHTML;
+    console.log(select);
+    // Cell 2: Product Dropdown
+    var cell2 = newRow.insertCell(1);
+    cell2.innerHTML = '<div style="display: flex; position: relative;">' +
+        '<select name="selected_item[]" onchange="fillItemDetails(this, this.parentNode.parentNode)" style="width: 120px;" class="form-control select2" id="select1">' +
+            select+
+        // '<option value="">-Select-</option>' +
+        // '{% for item in items %}' +
+        // '<option value="{{ item.id }}" data-hsn="{{ item.itm_hsn }}" data-price="{{ item.itm_purchase_price }}" data-tax="{{ item.itm_vat|floatformat:0 }}">{{ item.itm_name }}</option>' +
+        // '{% endfor %}' +
+        '</select>' +
+        '<a href="#" class="btn btn-outline-secondary" style="background-color: maroon; height: 40px; width: 30px; text-align: center; padding: 2px; position: absolute; right: 0; font-size: 20px; margin-left: 280px;" data-toggle="modal" data-target="#itemCreateModal"><b>+</b></a>' +
+        '</div>';
 
-        // Cell 3: HSN
-        var cell3 = newRow.insertCell(2);
-        cell3.innerHTML = '<span id="hsn' + tableBody.rows.length + '" class="form-control" style="height: 40px; width: 90px;"></span>';
+    // Cell 3: HSN
+    var cell3 = newRow.insertCell(2);
+    cell3.innerHTML = '<span id="hsn' + tableBody.rows.length + '" class="form-control" style="height: 40px; width: 90px;"></span>';
 
-        // Cell 4: Quantity
-        var cell4 = newRow.insertCell(3);
-        cell4.innerHTML = '<input type="number" name="item_quantity[]" style="width: 90px;" class="form-control" value="0" oninput="updateTotalAmount(this);updateTotals(this); updateTaxAmount(this);" required>';
+    // Cell 4: Quantity
+    var cell4 = newRow.insertCell(3);
+    cell4.innerHTML = '<input type="number" name="item_quantity[]" style="width: 90px;" class="form-control" value="0" oninput="updateTotalAmount(this);updateTotals(this); updateTaxAmount(this);" required>';
 
-        // Cell 5: Purchase Price
-        var cell5 = newRow.insertCell(4);
-        cell5.innerHTML = '<span id="purchasePrice' + tableBody.rows.length + '" style="width: 90px; height: 40px;" class="form-control" name="purchaseprice[]"></span>';
+    // Cell 5: Purchase Price
+    var cell5 = newRow.insertCell(4);
+    cell5.innerHTML = '<span id="purchasePrice' + tableBody.rows.length + '" style="width: 90px; height: 40px;" class="form-control" name="purchaseprice[]"></span>';
 
-        // Cell 6: VAT
-        var cell6 = newRow.insertCell(5);
-        cell6.innerHTML = '<span id="vat' + tableBody.rows.length + '" style="width: 90px; height: 40px;" class="form-control"></span>';
+    // Cell 6: VAT
+    var cell6 = newRow.insertCell(5);
+    cell6.innerHTML = '<span id="vat' + tableBody.rows.length + '" style="width: 90px; height: 40px;" class="form-control"></span>';
 
-        // Cell 7: Discount
-        var cell7 = newRow.insertCell(6);
-        cell7.innerHTML = '<input type="number" name="item_discount[]" class="form-control" style="width: 80px;" value="0" oninput="updateTotalAmount(this);updateTotals(this); updateTaxAmount(this);">';
+    // Cell 7: Discount
+    var cell7 = newRow.insertCell(6);
+    cell7.innerHTML = '<input type="number" name="item_discount[]" class="form-control" style="width: 80px;" value="0" oninput="updateTotalAmount(this);updateTotals(this); updateTaxAmount(this);">';
 
-        // Cell 8: Total Amount
-        var cell8 = newRow.insertCell(7);
-        cell8.innerHTML = '<input type="number" name="item_total_amount[]" readonly class="form-control" style="width: 100px;" value="0">';
+    // Cell 8: Total Amount
+    var cell8 = newRow.insertCell(7);
+    cell8.innerHTML = '<input type="number" name="item_total_amount[]" readonly class="form-control" style="width: 100px;" value="0">';
 
-        var cell9 = newRow.insertCell(8);
-        cell9.innerHTML = '<i class="fas fa-trash-alt fa-lg delete-row" style="margin-left: 10px;"></i>';
+    var cell9 = newRow.insertCell(8);
+    cell9.innerHTML = '<i class="fas fa-trash-alt fa-lg delete-row" style="margin-left: 10px;"></i>';
 
-        // Add an event listener to the new product dropdown for dynamic updates
-        var newSelect = cell2.querySelector('select[name="selected_item[]"]');
-        newSelect.addEventListener('change', function() {
-            fillItemDetails(newSelect, newRow);
-        });
-                // Add an event listener to the new discount input for dynamic updating
-        var newDiscountInput = cell7.querySelector('[name="item_discount[]"]');
-        newDiscountInput.addEventListener('input', function () {
+    // Add event listeners for dynamically added elements
+    var newSelect1 = newRow.querySelector('#select1');
+    var newSelect2 = newRow.querySelector('.select2');
+    var newDiscountInput = newRow.querySelector('[name="item_discount[]"]');
+
+    // Event listener for select1 dropdown
+    newSelect1.addEventListener('change', function () {
+        fillItemDetails(newSelect1, newRow);
+    });
+
+    // Event listener for select2 dropdown
+    $(newSelect2).on('change', function () {
+        var selectedOption = $(this).find('option:selected');
+        var hsn = selectedOption.data('hsn') || "";
+        var purchasePrice = selectedOption.data('price') || "";
+        var vat = selectedOption.data('tax') || "";
+        $('#hsn' + newRow.rowIndex).text(hsn);
+        $('#purchasePrice' + newRow.rowIndex).text(purchasePrice);
+        $('#vat' + newRow.rowIndex).text(vat);
+        updateTaxAmount();
+        fillItemDetails(selectedOption);
+    });
+
+    // Event listener for discount input
+    newDiscountInput.addEventListener('input', function () {
         updateTotalAmount1(newDiscountInput);
         updateTotals();
-      
     });
 
+    // Reload item dropdown to update options
+    reloadItem();
 
-// Add event listener to Adjustment input for dynamic updating
-        document.getElementById('adjustment').addEventListener('input', function () {
-         updateTotals(); // Call the function to update Grand Total and Tax Amount
-       
-      
+    // Update IDs for the new row
+    updateRowIds(newRow);
+}
 
-        });
+// Function to increment IDs and update the new row
+function updateRowIds(row) {
+    var rowCount = document.querySelectorAll('.table tbody tr').length;
 
-        // Increment IDs and update the new row
-        updateRowIds(newRow);
-        // updateTotalAmount1(document.getElementById('adjustment'));
-
-    
-    }
-    $('.select2').select2({
-        placeholder: 'Another Select Product',
-        allowClear: true,
-        width: '100%',
-    });
-
-    // Clear selection in the newly added dropdown
-    $('.select2').val(null).trigger('change');
-
-    // Function to increment IDs and update the new row
-    
-    function updateRowIds(row) {
-        var rowCount = document.querySelectorAll('.table tbody tr').length;
-
-        // Update IDs for the new row
-        row.querySelector('span[id^="hsn"]').id = 'hsn' + rowCount;
-        row.querySelector('span[id^="purchasePrice"]').id = 'purchasePrice' + rowCount;
-        row.querySelector('span[id^="vat"]').id = 'vat' + rowCount;
-        row.classList.add('new-row');
-
-
-        updateTotals();
-
-    }
-
-    function fillItemDetails(selectElement, row) {
+    // Update IDs for the new row
+    row.querySelector('span[id^="hsn"]').id = 'hsn' + rowCount;
+    row.querySelector('span[id^="purchasePrice"]').id = 'purchasePrice' + rowCount;
+    row.querySelector('span[id^="vat"]').id = 'vat' + rowCount;
+    row.classList.add('new-row');
+}
+   function fillItemDetails(selectElement, row) {
         // Get the selected option
         var selectedOption = selectElement.options[selectElement.selectedIndex];
 
@@ -1814,9 +1960,7 @@ $(document).ready(function() {
         var discount = parseFloat(row.querySelector('[name="item_discount[]"]').value) || 0;
 
         updateTotals();
-        
-    
-
+        updateTaxAmount();
       
     }
 
@@ -1920,36 +2064,35 @@ function updateTotals() {
 
     console.log("Page Loaded");
 });
+
 function updateTaxAmount() {
  
-    var rows = document.querySelectorAll('.table tbody tr');
+ var rows = document.querySelectorAll('.table tbody tr');
 
-    var taxAmount = 0;
+ var taxAmount = 0;
 
-    rows.forEach(function (row) {
-        console.log('hai');
-        var quantity = parseFloat(row.querySelector('[name="item_quantity[]"]').value) ;
-  
-        var discount = parseFloat(row.querySelector('[name="item_discount[]"]').value) ;
+ rows.forEach(function (row) {
+     console.log('hai');
+     var quantity = parseFloat(row.querySelector('[name="item_quantity[]"]').value) ;
 
-   
-        var itmVat =(row.querySelector('select[name="selected_item[]"]').selectedOptions[0].getAttribute('data-tax')).replace(/[^\d.]/g, '') || 0;
-        var price = parseFloat(row.querySelector('select[name="selected_item[]"]').selectedOptions[0].getAttribute('data-price')) || 0;
-        console.log(itmVat);
-        console.log(price,"hai");
-
-        var rowTaxAmount = (quantity * price - discount) * (itmVat / 100);
-        taxAmount += rowTaxAmount;
-        $('#tax_amount_' + rowId).val(taxAmount.toFixed(2));
-    });
-
-    document.getElementById('taxAmount').value = taxAmount.toFixed(2);
-    console.log(taxAmount);
+     var discount = parseFloat(row.querySelector('[name="item_discount[]"]').value) ;
 
 
-    updateTotals();
+     var itmVat =(row.querySelector('select[name="selected_item[]"]').selectedOptions[0].getAttribute('data-tax')).replace(/[^\d.]/g, '') || 0;
+     var price = parseFloat(row.querySelector('select[name="selected_item[]"]').selectedOptions[0].getAttribute('data-price')) || 0;
+     console.log(itmVat);
+     console.log(price,"hai");
+
+     var rowTaxAmount = (quantity * price - discount) * (itmVat / 100);
+     taxAmount += rowTaxAmount;
+ });
+
+ document.getElementById('taxAmount').value = taxAmount.toFixed(2);
+ console.log(taxAmount);
+
+
+ updateTotals();
 }
-
 </script>
    </body>
             
