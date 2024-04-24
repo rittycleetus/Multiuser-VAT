@@ -342,7 +342,7 @@
                                     <select name="selected_item[]" onchange="fillItemDetails1(this)" class="form-control select2" id="select1">
                                         <option value="">-Select-</option>
                                         {% for item in items %}
-                                            <option value="{{ item.id }}" data-hsn="{{ item.itm_hsn }}" data-price="{{ item.itm_purchase_price }}" data-tax="VAT {{ item.itm_vat|floatformat:0 }}%">{{ item.itm_name }}</option>
+                                            <option value="{{ item.id }}" data-hsn="{{ item.itm_hsn }}" data-price="{{ item.itm_purchase_price }}" data-tax=" {{ item.itm_vat }}">{{ item.itm_name }}</option>
                                         {% endfor %}
                                     </select>
                                     
