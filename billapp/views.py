@@ -2204,7 +2204,7 @@ def debit_note_redirect(request):
 
 @csrf_exempt
 def createdebitnote(request):
-    # Fetch the company based on the user's role
+
     if request.user.is_company:
         cmp = request.user.company
     else:
@@ -2212,9 +2212,10 @@ def createdebitnote(request):
 
     parties = Party.objects.filter(company=cmp)
     bills = PurchaseBill.objects.filter(company=cmp)
-    unit = Unit.objects.filter(company=cmp)
+    units = Unit.objects.filter(company=cmp)
     items = Item.objects.filter(company=cmp)
     print("Bills:", bills)
+    print("Units:", units)
 
     # Determine the next return number
     last_debit_note = DebitNote.objects.filter(company=cmp).order_by('-returnno').first()
@@ -2228,7 +2229,7 @@ def createdebitnote(request):
         'parties': parties,
         'bills': bills,
         'items': items,
-        'units': unit,
+        'units': units,
         'company_id': cmp.id,  # Pass company_id to the template
         'count': next_return_no,  # Pass the next return number to the template
     }
@@ -2489,8 +2490,7 @@ def item_create1(request):
     # Render a response if not a POST request
     return render(request, 'createdebitnote.html')
 
-    # Render a response if not a POST request
-    return render(request, 'createdebitnote.html')
+    
 
 
 
@@ -2508,7 +2508,7 @@ def create_unit1(request):
             unit_name=unit_name
         )
         
-        # Prepare the JSON response data
+    
         response_data = {
             'success': True,
             'message': 'Unit created successfully!',
@@ -2519,7 +2519,7 @@ def create_unit1(request):
 
         return JsonResponse(response_data)
 
-    # Handle other HTTP methods if needed
+  
     return JsonResponse({'success': False, 'message': 'Invalid request method'})
 
 def save_debit_note(request):

@@ -40,6 +40,7 @@
     .form-control {
         border: 2px solid #FFD6D7;
         transition: border-color 0.3s;
+       
     }
 
     .form-control:focus {
@@ -207,7 +208,7 @@
 
 <div class="body-wrapper">
     <div class="container-fluid">
-        <form action="{% url 'edit_debit_note' debit_id=debitnote.id %}" method="post" enctype="multipart/form-data">
+        <form action="{% url 'edit_debit_note' debit_id=debitnote.id %}" method="post" enctype="multipart/form-data" id="myForm">
             {% csrf_token %}
             <h1 class="mb-4">DEBIT NOTE</h1>
      
@@ -258,9 +259,9 @@
                             {% endfor %}
                         </select>
                       
-                            <!-- <div class="input-group-append">
+                            <div class="input-group-append">
                                 <button type="button" class="btn btn-outline-secondary" style="background-color: maroon;" data-toggle="modal" data-target="#createPartyModal">+</button>
-                            </div> -->
+                            </div>
                         </div>
                     </div>
                     <br>
@@ -274,9 +275,9 @@
                         <input type="text" class="form-control" id="contact_number" value="{{ debitnote.party.contact }}" readonly >
                     </div>
                     <br>
-                    <div class="form-group" id="partyAddressGroup">
-                        <label for="party_address">Party Address</label>
-                        <input type="text" class="form-control" id="party_address" value="{{ debitnote.party.address }}" readonly>
+                    <div class="form-group" id="addressSection">
+                        <label for="address">Party Address</label>
+                        <input type="text" class="form-control" id="addressa" value="{{ debitnote.party.address }}" readonly>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -334,23 +335,27 @@
                             <td style="width: 990px;">
                                 <div style="display: flex; position: relative;">
                                     <select name="selected_item[]" style="width: 130px;" class="form-control select2" id="select1" onchange="fillItemDetails1(this)">
-                                        <option value="{{ item.id }}" data-hsn="{{ item.itm_hsn }}" data-price="{{ item.purchaseprice }}" data-tax="VAT {{ item.vat }}" selected>{{ item.name }}</option>
+                                        <option value="{{ item.id }}" data-hsn="{{ item.itm_hsn }}" data-price="{{ item.purchaseprice }}" data-tax=" {{ item.vat }}" selected>{{ item.name }}</option>
                                          {% for s_item in items %} 
                                         
                                            
-                                                <option value="{{ s_item.id }}" data-hsn="{{ s_item.itm_hsn }}" data-price="{{ s_item.itm_purchase_price }}" data-tax="VAT {{ s_item.itm_vat|floatformat:0 }}%">{{ s_item.itm_name }}</option>
+                                                <option value="{{ s_item.id }}" data-hsn="{{ s_item.itm_hsn }}" data-price="{{ s_item.itm_purchase_price }}" data-tax=" {{ s_item.itm_vat}}">{{ s_item.itm_name }}</option>
                                                 
                                         {% endfor %} 
-                                    
+                          
                                     </select>
-                                    
+                                    &nbsp;&nbsp; &nbsp;&nbsp;                        &nbsp;&nbsp; &nbsp;&nbsp;
+                                    <!-- "+" button -->
+                                 <a href="#" class="btn btn-outline-secondary" style="background-color: maroon; height: 40px; width: 30px; text-align: center; padding: 2px; position: absolute; right: 0; font-size: 20px; margin-left: 280px;" data-toggle="modal" data-target="#itemCreateModal"><b>+</b></a>
+
+
                                 </div>
                             </td>
                            
                             <td><span id="hsn" class="form-control" style="height: 40px; width: 90px;">{{ item.itm_hsn }}</span></td>
                             <td><input type="number" name="item_quantity[]" id="item_quantity[]" style="width: 90px;" class="form-control" value="{{ item.qty }}" oninput="updateTotalAmount1(this);updateTotals(this);updateTaxAmount(this);" required></td>
                             <td><span id="purchasePrice" style="width: 90px; height: 40px;" class="form-control" name="purchaseprice[]">{{ item.purchaseprice }}</span></td>
-                            <td><span id="vat" style="width: 90px; height: 40px;" class="form-control">VAT {{ item.vat|floatformat:0 }}%</span></td>
+                            <td><span id="vat" style="width: 90px; height: 40px;" class="form-control">{{ item.vat }}</span></td>
                             <td><input type="number" name="item_discount[]" class="form-control" style="width: 80px;" value="{{ item.discount }}" oninput="updateTotalAmount1(this);updateTotals(this);updateTaxAmount(this);"></td>
                             <td><input type="number" name="item_total_amount[]" readonly class="form-control" style="width: 100px;" value="{{ item.total_amount }}"></td>
                             <td><i class="fas fa-trash-alt fa-lg delete-row" style="margin-left: 10px;"></i></td>
@@ -431,11 +436,11 @@
 
 
 
-<!-- <div> -->
+ <div> 
 
 
 <!-- Modal -->
-    <!-- <div class="itemmodal">
+     <div class="itemmodal">
     <div class="modal fade" id="itemCreateModal" tabindex="-1" aria-labelledby="ItemCreateModalLabel" aria-hidden="true">
        <div class="modal-dialog modal-lg">
            <div class="modal-content">
@@ -553,17 +558,15 @@
                         <div class="pt-5 mb-4">
                             <input type="text" name="taxable_result" id="taxable_result" hidden>
                             <label style="user-select: none;" class="fs-4 tb" for="item_tax_1">Tax</label> &nbsp;
-                            <input id="item_tax_1" class="me-3" type="radio" name="item_tax_result" required>
+                            <input id="item_tax_1" class="me-3" type="radio" name="item_tax_result">
                             <label style="user-select: none;" class="fs-4 tb" for="item_tax_2">Tax Excempted</label>&nbsp;
-                            <input id="item_tax_2" type="radio" name="item_tax_result" required>
+                            <input id="item_tax_2" type="radio" name="item_tax_result">
                         </div>
 
-                        <div id="vatdiv" class="mb-2 pt-3" hidden>
+                        <div id="vatdiv" class="mb-2 pt-3" style="display: none;">
                             <label class="fw-bold tb fs-3" for="">VAT</label><br>
                             <input type="text" class="form-control mt-1 input_border text-black" name="vat" id='vat1'>
                         </div>
-   
-
 
 
 
@@ -607,7 +610,7 @@
            </div>
        </div>
    </div>
-   </div> --> 
+   </div> 
 
 
    <!-- <script>
@@ -620,139 +623,341 @@
         //     partyAddressGroup.style.display = 'none'; // Hide the entire form group
         // }
     });
-</script> -->
-   <!-- <script>
-    $(document).ready(function () {
-        $('#item_tax_1').on('click', function () {
-            $('#vatdiv').attr('hidden', false);
-            $('#vat1').val('VAT 5%');
-        });
+</script> --><script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
-        $('#item_tax_2').on('click', function () {
-            $('#vatdiv').attr('hidden', false);
-            $('#vat1').val('VAT 0%');
-        });
 
-        $('#item_tax_1').on('click', function () {
-            $('#taxable_result').val('Taxable');
-        });
+<script>
+    $(document).ready(function() {
+    // Listen for click event on radio button with id 'item_tax_1'
+    $('#item_tax_1').click(function() {
+        // Show the vatdiv
+        $('#vatdiv').show();
+        $('#vat1').val('VAT 5%');
+        $('#taxable_result').val('Taxable');
+    });
+    $('#item_tax_2').click(function() {
+        // Show the vatdiv
+        $('#vatdiv').show();
+        $('#vat1').val('VAT 0%');
+        $('#taxable_result').val('Non Taxable');
+    });
+     // Listen for click event on radio button with id 'goods'
+     $('#goods').click(function() {
+        // Set itm_type value to 'Goods'
+        $('#itm_type').val('Goods');
+    });
+    
+    // Listen for click event on radio button with id 'service'
+    $('#service').click(function() {
+        // Set itm_type value to 'Services'
+        $('#itm_type').val('Services');
+    });
+    
+});
+</script>
 
-        $('#item_tax_2').on('click', function () {
-            $('#taxable_result').val('Non Taxable');
-        });
-
-        $('#goods').on('click', function () {
-            $('#itm_type').val('Goods');
-        });
-
-        $('#service').on('click', function () {
-            $('#itm_type').val('Service');
-        });
+<script>
+    $(document).ready(function() {
+       // Event handler for form submission
+       $(document).on("click", "#itemcreate", function () {
+           // Get CSRF token from the DOM
+           var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
    
-       
-    $(document).on("click", "#itemcreate", function(){
-        // Get item details from the form
-        var itemName = $('#itemName').val();
-        var itemHSN = $('#itemHSN').val();
-        var itemunit = $('#unit').val();
-        var itemtax1 = $('#item_tax_1').val();
-        var itemtax2 = $('#item_tax_2').val();
-        var vat1= $('#vat1').val();
-        var salesprice = $('#sal_price').val();
-        var purprice = $('#pur_price').val();
-        var openstock= $('#opn_stock').val();
-        var atprice = $('#at_price').val();
-        var dateitem = $('#date').val();
-        
+           // Get item details from the form
+           var itemName = $('#itemName').val().trim();
+           var itemHSN = $('#itemHSN').val().trim();
+           var itemtype = $('#itm_type').val().trim();
+           var itemunit = $('#unit').val().trim();
+           var itemtaxable = $('#taxable_result').val().trim();
+           var itemtax1 = $('#item_tax_1').is(':checked') ? $('#item_tax_1').val() : '';
+           var itemtax2 = $('#item_tax_2').is(':checked') ? $('#item_tax_2').val() : '';
+           var vat1 = $('#vat1').val().trim();
+           var salesprice = $('#sal_price').val().trim();
+           var purprice = $('#pur_price').val().trim();
+           var openstock = $('#opn_stock_').val().trim();
+           var atprice = $('#at_price').val().trim();
+           var dateitem = $('#date').val().trim();
+   
+           // Validate item name and HSN
+           if (itemName === '') {
+               alert('Please provide an item name');
+               return;
+           }
+           if (!validateHSN(itemHSN)) {
+               alert('Please provide a valid 6-digit HSN number.');
+               return;
+           }
+   
+           // AJAX request
+           $.ajax({
+               type: 'POST',
+               url: "{% url 'item_create1' %}",
+               data: {
+                   itemName: itemName,
+                   itemHSN: itemHSN,
+                   itm_type: itemtype,
+                   unit: itemunit,
+                   taxable_result: itemtaxable,
+                   tax1: itemtax1,
+                   tax2: itemtax2,
+                   vat1: vat1,
+                   sal_price: salesprice,
+                   pur_price: purprice,
+                   opn_stock_: openstock,
+                   at_price: atprice,
+                   date: dateitem,
+                   csrfmiddlewaretoken: csrfToken
+               },
+               success: function (response) {
+                   alert('Item added successfully!');
+                   
+                   // Clear form fields
+                   $('#itemName, #itemHSN, #unit, #taxable_result, #vat1, #opn_stock_, #sal_price, #pur_price, #at_price, #date').val('');
+                   
+                   // Close modal
+                   $('#itemCreateModal .btn-close').click();
+                      // Clear radio button selections
+                   $('#goods, #service, #item_tax_1, #item_tax_2').prop('checked', false);
+                
+                   // Reload item dropdown
+                   reloadItem();
+                   fillItemDetails1(selectElement);
+               },
+               error: function(xhr, status, error) {
+                   console.error(xhr.responseText);
+               }
+           });
+       });
+   
+       // Function to reload item dropdown
+       function reloadItem() {
+    $.ajax({
+        url: "{% url 'get_item_dropdown' %}",
+        type: "GET",
+        dataType: "json",
+        success: function(data) {
+            $('tr').each(function() {
+                var row = $(this);
+                var drop = row.find('.select2');
+                var existingVal = drop.val();
+                var optionExists = false;
+                console.log(data);
+                drop.empty().append('<option disabled selected>Select Item</option>');
+                $.each(data, function(key, value) {
+                    drop.append($('<option></option>').attr('value', value[0]).attr('data-hsn', value[2]).attr('data-price', value[3]). attr('data-tax', value[4]).text(value[1]));
+                });
 
-       
+                
+
+                if (optionExists) {
+                    drop.val(existingVal);
+                }
+            });
+        },
+        error: function(xhr, status, error) {
+            console.error(xhr.responseText);
+        }
+    });
+}
+   // Function to validate HSN number
+function validateHSN(hsn) {
+    if (hsn.length !== 6) {
+        $('#hsnErrorMessage').text('Please provide a 6-digit HSN number.');
+        return false;
+    } else {
+        $('#hsnErrorMessage').text('');
+        return true;
+    }
+}
+
+
+$(document).ready(function() {
+    $('#itemHSN').blur(function() {
+        var hsn = $(this).val();
         $.ajax({
-            type : 'POST',
-            url: "{% url 'item_create' %}",
+            url: 'check_hsn_number_existsdebit',
             data: {
-                name: itemName,          
-        hsn: itemHSN,           
-        unit: itemunit,          
-        tax1: itemtax1,          
-        tax2: itemtax2,          
-        vat1: vat1,              
-        sales_price: salesprice, 
-        pur_price: purprice,     
-        open_stock: openstock,   
-        at_price: atprice,       
-        date: dateitem,         
-        csrfmiddlewaretoken: '{{ csrf_token }}', 
-    }, function(response) {
-                
-                $('#itemCreationForm').trigger("reset");
-                $('#itemCreationModal').modal('hide');
-                
-                reloadItems();
+                'hsn': hsn
             },
-            error: function(xhr, errmsg, err) {
-                // Handle error
-                console.log(errmsg);
+            dataType: 'json',
+            success: function(data) {
+                if (data.exists) {
+                    $('#hsnerror').text('HSN number already exists!');
+                } else {
+                    $('#hsnerror').text('');
+                }
             }
         });
-    }); -->
+    });
+});
 
-<!--    
-       $("#unitmodalsubmit").click(function () {
-    $.ajax({
-        type: "POST",
-        url: "{% url 'create_unit' %}",
-        data: {
-            unit_name: $('#unit_name').val() // Use jQuery to get the value of unit_name
-        },
-        beforeSend: function (xhr, settings) {
-            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
-        },
-        success: function (response) {
-            // Close the modal
-            $('#unitmodal').hide();
-            $(".modal-backdrop").remove();
-            // Clear the input field
-            $('#unit_name').val('');
-            // Add the new unit to the dropdown
-            $('#unit').append($('<option>', {
-                value: response.id,
-                text: response.unit_name
-            }));
-            
-     
-          
-  
-   
-   
-            // Provide feedback to the user
-            console.log("Unit added successfully!");
-            alert("Unit added successfully!");
-        },
-        error: function (xhr, textStatus, errorThrown) {
-            console.error("Error adding unit:", errorThrown);
+ // Event handler for change in item name
+ $(document).on('change', '[id^=item_name_]', function () {
+        var rowId = $(this).attr('id').split('_')[2]; // Extract the row number from the ID
+        var selectedId = $(this).val(); // Get the selected item ID
+        var itemId = selectedId.split(' ')[0];
+
+        // Make an AJAX request to fetch the item details
+        $.ajax({
+            url: "{% url 'fetch_item_details' %}",
+            data: {
+                id: itemId,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            type: 'POST',
+            success: function (data) {
+                // Update the corresponding input fields in the same row with fetched data
+                $('#hsn_' + rowId).val(data.hsn);
+                $('#price_' + rowId).val(data.price);
+                $('#tax_' + rowId).val(data.tax);
+                updateTaxAmount();
+            }
+        });
+    });
+
+    // Event handler for change in item name (alternative approach)
+    $("#select1").change(function(){
+        var selectedValue = $(this).val();
+        var itemId = selectedValue.split(' ')[0];
+        
+        $.ajax({
+            url:"{% url 'item_details' %}",
+            data:{
+                id: selectedValue,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            type:'POST',
+            success: function(data) {
+                $('#hsn').text(data.hsn);
+                $('#purchasePrice').text(data.price);
+                $('#vat').text(data.tax);
+                updateTaxAmount();
+        }
+
+        });
+    });
+});
+
+ $(document).on('change', '[id^=quantity_]', function() {
+        
+        var rowId = $(this).attr('id').split('_')[1];
+        
+        var quantity = parseInt($(this).val());
+        
+        var price = parseFloat($('#price_' + rowId).val());
+        
+        var taxRate = parseFloat($('#tax_' + rowId).val());
+        
+      
+        var taxAmount = quantity * price * (taxRate / 100);
+
+        
+        $('#tax_amount_' + rowId).val(taxAmount.toFixed(2));
+    });
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("myForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        if (validateForm()) {
+            this.submit(); // If validation passes, submit the form
         }
     });
 });
-                 </script>
-               </div>
-             </div>
-           </div>
-         </div>
-       </div>
-     </div>
-   
-   
-   
-   
-   
-                 
-                   
-   </div>
+
+function validateForm() {
+    var quantityInputs = document.getElementsByName("item_quantity[]");
+
+    for (var i = 0; i < quantityInputs.length; i++) {
+        var quantityInput = quantityInputs[i];
+
+        // Check if the quantity input value is empty, 0, or less than zero
+        if (quantityInput.value.trim() === '' || parseFloat(quantityInput.value) <= 0) {
+            alert("Please enter a quantity greater than zero for each item.");
+            quantityInput.focus(); // Focus on the input field with the invalid quantity
+            return false; // Prevent form submission
+        }
+    }
+
+    return true; // Allow form submission if all quantities are greater than zero
+}
+
     
-   
-   
-   
-   
+
+
+
+
+
+</script>
+<script> $(document).ready(function () {
+    $("#unitmodalsubmit").click(function () {
+        // Get the unit name from the input field
+        var unitName = $('#unit_name').val();
+
+        // Check if the unit name is null or empty
+        if (!unitName) {
+            alert("Unit name cannot be empty!");
+            return;
+        }
+
+        // Check if the unit name already exists in the dropdown
+        if ($('#unit option').filter(function () {
+            return $(this).text().toLowerCase() === unitName.toLowerCase();
+        }).length > 0) {
+            // If the unit already exists, show an alert
+            alert("Unit already exists!");
+            $('#unit_name').val('');
+            return; 
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'create_unit1' %}",
+            data: {
+                unit_name: unitName
+            },
+            beforeSend: function (xhr, settings) {
+                xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+            },
+            success: function (response) {
+                // Close the modal
+                $('#unitmodal').hide();
+                $(".modal-backdrop").remove();
+                // Clear the input field
+                $('#unit_name').val('');
+                // Add the new unit to the dropdown
+                $('#unit').append($('<option>', {
+                    value: response.id,
+                    text: response.unit_name
+                }).text(response.unit_name));
+                // Provide feedback to the user
+                console.log("Unit added successfully!");
+                alert("Unit added successfully!");
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.error("Error adding unit:", errorThrown);
+            }
+        });
+    });
+});
+
+</script>
+
+
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+
+  
+    
+</div>
+
    
    
    
@@ -780,12 +985,14 @@
                            <div class="col-md-9 row" style="margin-top: 3vw;">
                                <div class="col-md-4">
                                    <input type="text" style="background-color: white;" class="form-control" id="partyname" name="partyname" placeholder="Party Name" required>
-                               </div>                
+                               </div>       
+
                                <div class="col-md-4" style="position: relative;">
-                                   <input type="text" style="background-color: white;" class="form-control" id="trn_no" name="trn_no" placeholder="TRN NO" oninput="validateGSTIN(this)">
-                                   <span id="gstno-validation" style="position: absolute; right: 14px; top: 8px;"></span>
-                                   <label style="color: rgb(101, 3, 3);">* 32AAQFR1222B1ZS</label>
-                               </div>
+                                <input required type="text" style="background-color: white;" class="form-control" id="trn_no" name="trn_no" placeholder="TRN NO" oninput="validateGSTIN(this)">
+                                <span id="gstno-validation" style="position: absolute; right: 14px; top: 8px;"></span>
+                                <label id="trn_no_error" style="color: red;"></label>
+                                <label style="color: rgb(101, 3, 3);">* 32AAQFR1222B1ZS</label>
+                            </div>
                                
                                <div class="col-md-4" style="position: relative;">
                                    <input required type="number" style="background-color: white;" class="form-control" id="contact" pattern="[0-9]{10}" name="contact" placeholder="Phone Number" oninput="validatePhoneNumber(this)">
@@ -876,7 +1083,7 @@
            </div>
        </div>
    </div>
-   </div>
+   </div> 
    <script>
        
    function saveParty() {
@@ -916,246 +1123,192 @@
        
            
        $.ajax({
-           url: "{% url 'create_party' %}",
-           type: 'POST',
-           data: data,
-           processData: true,
-      
-          
-           success: function (response) {
-              console.log('New party created successfully!');
-              console.log('Success:', response);
-               
-               toastr.success('New party created successfully!');
-               // $('#createPartyModal').modal('hide');
-               
-               clearFormFields();
-               $('#close-btn').click();
-               console.log(response.parties);
-               
-               addToDropdown(response.parties);
-   
-              
-              
-           },
-           error: function (error) {
-               console.error('Error:', error);
-           }
-       });
-       function addToDropdown(data) {
-       // console.log(data.name,'gee');
-   
-       var dropdown = $('#party');
-   
-      
-       var option = $('<option>', {
-           value: data.id,
-           text: data.name
-   
-       });
-       option.attr('data-address', data.address);
-   
-       
-       dropdown.append(option);
-       handlePartySelection();
-       }
-   } -->
-       
-<!--    $.ajax({
-//     url: "{% url 'create_party' %}",
-//     type: 'POST',
-//     data: data,
-//     processData: true,
-//     success: function (response) {
-//         console.log('New party created successfully!');
-//         console.log('Success:', response);
-
-//         toastr.success('New party created successfully!');
-//         // $('#createPartyModal').modal('hide');
-
-//         clearFormFields();
-//         $('#close-btn').click();
-//         console.log(response.parties);
-
-//         addToDropdown(response.parties);
+    url: "{% url 'create_party' %}",
+    type: 'POST',
+    data: data,
+    processData: true,
+    success: function (response) {
+        console.log('New party created successfully!');
+        console.log('Success:', response);
         
-//         // Update fields when party is selected
-//         $('#party').change(function() {
-//             var selectedPartyId = $(this).val();
-//             var selectedParty = response.parties.find(party => party.id == selectedPartyId);
-//             if (selectedParty) {
-//                 $('#contact').val(selectedParty.contact);
-//                 $('#address1').val(selectedParty.address);
-//                 // Update other fields as needed
-//             }
-//         });
-//     },
-//     error: function (error) {
-//         console.error('Error:', error);
-//     }
+        toastr.success('New party created successfully!');
+        
+        
+        var newParty = response.newParty;
+        console.log(newParty);
+        
+        if (newParty) {
+            handleNewPartyCreation(newParty);
+            console.log("hai");
+            $('#contact').val(newParty.contact);
+            $('#addressa').val(newParty.address);
+            $('#available_balance').val(newParty.openingbalance);
+        } else {
+            console.error("New party object is undefined.");
+        }
+        
+        clearFormFields();
+        $('#close-btn').click();
+        console.log(response.parties);
+        
+        addToDropdown(response.parties, response); 
+    },
+    error: function (error) {
+        console.error('Error:', error);
+    }
+});
+function addToDropdown(data, response) {
+    var dropdown = $('#party');
+    var option = $('<option>', {
+        value: data.id,
+        text: data.name
+    });
+    dropdown.append(option);
+
+    $('#party').change(function() {
+        console.log("koo");
+        var selectedPartyId = $(this).val();
+        if (!Array.isArray(response.parties)) {
+            response.parties = Array.from(response.parties);
+        }
+        console.log("Selected Party ID:", selectedPartyId);
+        console.log("All Parties in response:", response.parties);
+        // Check if response.parties is an array before using the find method
+        if (Array.isArray(response.parties)) {
+            var selectedParty = response.parties.find(party => party.id == selectedPartyId);
+            if (selectedParty) {
+                $('#contact').val(selectedParty.contact);
+                $('#addressa').val(selectedParty.address);
+                $('#available_balance').val(selectedParty.openingbalance);
+                console.log(selectedParty.contact);
+                console.log(selectedParty.address);
+                console.log(selectedParty.openingbalance);
+               
+            } else {
+                console.error("Selected party not found in response.parties.");
+            }
+        } else {
+            console.error("response.parties is not an array.");
+        }
+    });
+}
+    }
+    
+// document.addEventListener("DOMContentLoaded", function() {
+//     populateReturnNumber();
 // });
 
-// function addToDropdown(parties) {
-//     var dropdown = $('#party');
-//     dropdown.empty(); // Clear existing options
-//     parties.forEach(function(party) {
-//         var option = $('<option>', {
-//             value: party.id,
-//             text: party.name
-//         });
-//         dropdown.append(option);
-//     });
-//     handlePartySelection();
+
+// function populateReturnNumber() {
+//     var returnNoField = document.getElementById("return_no");
+//     var debitnoteReturnNo = "{{ debitnote.returnno }}";
+//     returnNoField.setAttribute("value", debitnoteReturnNo); 
+//     returnNoField.value = debitnoteReturnNo; 
+//     console.log(debitnoteReturnNo);
 // }
 
-   function clearFormFields() {
+
+// document.addEventListener("change", function(event) {
+//     var target = event.target;
    
-       $('#partyname').val('');
-       $('#trn_no').val('');
-       $('#contact').val('');
-       $('#trn_type').prop('selectedIndex', 0);
-       $('#address1').val('');
-       $('#state').val('');
-       $('#email').val('');
-       $('#balance').val('');
-       $('input[name="paymentType"]').prop('checked', false);
-       $('#current-date1').val('');
-       $('#additionalfield1').val('');
-       $('#additionalfield2').val('');
-       $('#additionalfield3').val('');
+//     if (target.id !== "return_no") {
+      
+//         populateReturnNumber();
+//     }
+// });
+       
+    function clearFormFields() {
    
+   $('#partyname').val('');
+   $('#trn_no').val('');
+   $('#contact').val('');
+   $('#trn_type').prop('selectedIndex', 0);
+   $('#address1').val('');
+   $('#state').val('');
+   $('#email').val('');
+   $('#balance').val('');
    $('input[name="paymentType"]').prop('checked', false);
-   }
-   </script> -->
-   <!-- <script>
-   $(document).ready(function () {
-       // Function to populate Indian states in the dropdown
-       function populateIndianStates() {
-           const indianStates = [
-               "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat",
-               "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra",
-               "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu",
-               "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"
-           ];
-   
-           const dropdown = $('#state');
-   
-           // Clear existing options
-           dropdown.empty();
-   
-           // Add a default option (optional)
-           dropdown.append('<option value="">Select State</option>');
-   
-           // Populate the dropdown with Indian states
-           indianStates.forEach(function (state) {
-               const option = $('<option>', {
-                   value: state,
-                   text: state
-               });
-   
-               dropdown.append(option);
+   $('#current-date1').val('');
+   $('#additionalfield1').val('');
+   $('#additionalfield2').val('');
+   $('#additionalfield3').val('');
+
+$('input[name="paymentType"]').prop('checked', false);
+}
+</script>
+<script>
+$(document).ready(function () {
+   // Function to populate Indian states in the dropdown
+   function populateIndianStates() {
+       const indianStates = [
+           "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat",
+           "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra",
+           "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu",
+           "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"
+       ];
+
+       const dropdown = $('#state');
+
+       // Clear existing options
+       dropdown.empty();
+
+       // Add a default option (optional)
+       dropdown.append('<option value="">Select State</option>');
+
+       // Populate the dropdown with Indian states
+       indianStates.forEach(function (state) {
+           const option = $('<option>', {
+               value: state,
+               text: state
            });
-       }
-   
-       // Call the populateIndianStates function to populate the dropdown on page load
-       populateIndianStates();
-   });
-   </script>
-   <script>
-   
-       function clearFieldsOnLoad() 
-       {
-        clearFormFields();
-           document.getElementById("return_no").value = "";
-           
-           document.getElementById("bill").value = "";
-           document.getElementById("bill_date").value = "";
-           document.getElementById("address1").value = "";
-           document.getElementById("available_balance").value = "";
-     
-           document.getElementById("party").value = "";
-           document.getElementById("contact_number").value = "";
-       }
-   
-       window.onload = clearFieldsOnLoad;
-   </script> -->
 
-                <!-- <script>
-                    function toggleSection(sectionId) {
-                        // Get all the fieldsets
-                        const fieldsets = document.querySelectorAll('fieldset');
-            
-                        // Hide all fieldsets
-                        fieldsets.forEach(fieldset => {
-                            fieldset.style.display = 'none';
-                        });
-            
-                        // Show the selected fieldset
-                        const section = document.getElementById(sectionId);
-                        if (section.style.display === 'none') {
-                            section.style.display = 'block';
-                        } else {
-                            section.style.display = 'none';
-                        }
+           dropdown.append(option);
+       });
+   }
+
+   // Call the populateIndianStates function to populate the dropdown on page load
+   populateIndianStates();
+});
+</script>
+<script>
+
+   function clearFieldsOnLoad() 
+   {
+    clearFormFields();
+       document.getElementById("return_no").value = "";
+       
+       document.getElementById("bill").value = "";
+       document.getElementById("bill_date").value = "";
+       document.getElementById("address1").value = "";
+       document.getElementById("available_balance").value = "";
+ 
+       document.getElementById("party").value = "";
+       document.getElementById("contact_number").value = "";
+   }
+
+   window.onload = clearFieldsOnLoad;
+</script>
+
+            <script>
+                function toggleSection(sectionId) {
+                    // Get all the fieldsets
+                    const fieldsets = document.querySelectorAll('fieldset');
+        
+                    // Hide all fieldsets
+                    fieldsets.forEach(fieldset => {
+                        fieldset.style.display = 'none';
+                    });
+        
+                    // Show the selected fieldset
+                    const section = document.getElementById(sectionId);
+                    if (section.style.display === 'none') {
+                        section.style.display = 'block';
+                    } else {
+                        section.style.display = 'none';
                     }
-            
-            
-                // Function to format the date as "YYYY-MM-DD"
-                function formatDate(date) {
-                    const year = date.getFullYear();
-                    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-                    const day = date.getDate().toString().padStart(2, '0');
-                    return `${year}-${month}-${day}`;
                 }
-            
-             
-    // Get the current date
-    let currentDate = new Date();
-
-    // Format the date to 'YYYY-MM-DD'
-    let formattedDate = currentDate.toISOString().split('T')[0];
-
-    // Set the formatted date as the default value for the input field
-    document.getElementById('current-date1').value = formattedDate;
-  
-            function validatePhoneNumber(inputElement) {
-                const phoneNumber = inputElement.value;
-                const validationSpan = document.getElementById("contact-validation");
-            
-                // Regular expression to check for a 10-digit number
-                const regex = /^[0-9]{10}$/;
-            
-                if (regex.test(phoneNumber)) {
-                    // Valid 10-digit number, display a checkmark
-                    validationSpan.innerHTML = "&#10004;"; // Checkmark symbol
-                    validationSpan.style.color = "green";
-                } else {
-                    // Not a valid 10-digit number, display a cross mark
-                    validationSpan.innerHTML = "&#10060;"; // Cross mark symbol
-                    validationSpan.style.color = "red";
-                }
-            }
-            
-            function validateGSTIN(inputElement) {
-                const gstin = inputElement.value;
-                const validationSpan = document.getElementById("gstno-validation");
-            
-                // Regular expression to check for a valid GSTIN pattern
-                const regex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9][A-Z][A-Z0-9]$/;
-            
-                if (regex.test(gstin)) {
-                    // Valid GSTIN format, display a checkmark
-                    validationSpan.innerHTML = "&#10004;"; // Checkmark symbol
-                    validationSpan.style.color = "green";
-                } else {
-                    // Not a valid GSTIN format, display a cross mark
-                    validationSpan.innerHTML = "&#10060;"; // Cross mark symbol
-                    validationSpan.style.color = "red";
-                }
-            }
-            
-            </script>
-           <script>
+        
+        
             // Function to format the date as "YYYY-MM-DD"
             function formatDate(date) {
                 const year = date.getFullYear();
@@ -1164,547 +1317,624 @@
                 return `${year}-${month}-${day}`;
             }
         
-            // Get the current date
-            const currentDateInput = document.getElementById("current-date");
-            const currentdate = new Date();
+         
+// Get the current date
+let currentDate = new Date();
+
+// Format the date to 'YYYY-MM-DD'
+let formattedDate = currentDate.toISOString().split('T')[0];
+
+// Set the formatted date as the default value for the input field
+document.getElementById('current-date1').value = formattedDate;
+
+        function validatePhoneNumber(inputElement) {
+            const phoneNumber = inputElement.value;
+            const validationSpan = document.getElementById("contact-validation");
         
-            // Format the date as "YYYY-MM-DD" and set it in the input field
-            currentDateInput.value = formatDate(currentDate);
-        </script>
-        <script>
-            $(document).ready(function () {
-                // Handle change event when a party is selected
-                $('#party').change(function () {
-                    // Get the selected party option
-                    var selectedOption = $(this).find(':selected');
+            // Regular expression to check for a 10-digit number
+            const regex = /^[0-9]{10}$/;
         
-                    // Update the input fields with the data attributes of the selected party
-                    $('#contact_number').val(selectedOption.data('contact'));
-                    $('#address').val(selectedOption.data('address'));
-                    $('#available_balance').val(selectedOption.data('openingbalance'));
-                    var billno=selectedOption.data('billno');
-                    console.log(billno)
-                    $('#bill').empty();
-                    $('#bill').append(`<option selected>${billno}</option> `)
-                });
-            });
-        </script>
-        <script>
-            
-    // Function to format the date as "YYYY-MM-DD"
-    function formatDate(date) {
-        const year = date.getFullYear();
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const day = date.getDate().toString().padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
-
-            const currentDateInput = document.getElementById("current-date");
-            currentDate = new Date();
-        
-            // Format the date as "YYYY-MM-DD" and set it in the input field
-            currentDateInput.value = formatDate(currentDate);
-        </script>
-            
-       </div>
-   </div>
-
-</script>
-<script>
-    $('#select1').on('change', function () {
-        // Your code here
-        var selectedItem = $(this).val();
-        console.log('Selected item:', selectedItem);
-    });
-</script>
-<script>
-    $(document).ready(function () {
-        // Get the initial pattern
-        var initialPattern = /^JK\d+$/i;
-
-        // Listen for changes in the "Return No." field
-        $('#return_no').change(function () {
-            // Get the entered return number
-            var returnNo = $(this).val();
-
-            // Check if the pattern is followed (e.g., JK1, JK2, JK3, ...)
-            if (!initialPattern.test(returnNo)) {
-                // Display a confirmation message
-                var confirmed = confirm('Changing the pattern will reset the return number. Are you sure you want to change the pattern?');
-
-                if (!confirmed) {
-                    // Revert to the previous value
-                    $(this).val('');
-                    return;
-                }
-
-                // Update the initial pattern if confirmed
-                initialPattern = new RegExp("^" + returnNo + "$", "i");
-            }
-
-            // Check if the pattern is followed (e.g., JK1, JK2, JK3, ...)
-            if (!initialPattern.test(returnNo)) {
-                // Display an error message
-                $('#return-no-message').text('Return No. should follow the pattern JK1, JK2, JK3, ...');
+            if (regex.test(phoneNumber)) {
+                // Valid 10-digit number, display a checkmark
+                validationSpan.innerHTML = "&#10004;"; // Checkmark symbol
+                validationSpan.style.color = "green";
             } else {
-                // Clear the error message
-                $('#return-no-message').text('');
-
-                // You can perform additional logic if needed
+                // Not a valid 10-digit number, display a cross mark
+                validationSpan.innerHTML = "&#10060;"; // Cross mark symbol
+                validationSpan.style.color = "red";
             }
+        } 
+        </script>
+        
+       
+
+            <script>
+    function validateGSTIN(inputElement) {
+        const gstin = inputElement.value;
+        const validationSpan = document.getElementById("gstno-validation");
+
+        // Regular expression to check for a valid GSTIN pattern
+        const regex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9][A-Z][A-Z0-9]$/;
+
+        if (regex.test(gstin)) {
+            // Valid GSTIN format, display a checkmark
+            validationSpan.innerHTML = "&#10004;"; // Checkmark symbol
+            validationSpan.style.color = "green";
+        } else {
+            // Not a valid GSTIN format, display a cross mark
+            validationSpan.innerHTML = "&#10060;"; // Cross mark symbol
+            validationSpan.style.color = "red";
+        }
+    }
+
+    $(document).ready(function() {
+        $('#trn_no').blur(function() {
+            var trn_no = $(this).val();
+            var trn_type = $('#trn_type').val();
+            $.ajax({
+                url: 'check_trn_no_exists',
+                data: {
+                    'trn_no': trn_no,
+                    'trn_type': trn_type
+                },
+                dataType: 'json',
+                success: function(data) {
+                    if (data.exists) {
+                        $('#trn_no_error').text('TRN number already exists!');
+                    } else {
+                        $('#trn_no_error').text('');
+                    }
+                }
+            });
         });
-
-        // Automatically generate and set the initial return number on form load
-        var lastReturnNo = getLastReturnNo(); // You need to implement this function
-        var newReturnNo = generateNextReturnNo(lastReturnNo);
-        $('#return_no').val(newReturnNo);
     });
+</script>
+       <script>
+        // Function to format the date as "YYYY-MM-DD"
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+    
+        // Get the current date
+        const currentDateInput = document.getElementById("current-date");
+        const currentdate = new Date();
+    
+        // Format the date as "YYYY-MM-DD" and set it in the input field
+        currentDateInput.value = formatDate(currentDate);
+    </script>
 
-    // Function to get the last return number from the database or any other source
-    function getLastReturnNo() {
-        // Implement logic to get the last return number
-        // For now, let's assume it returns the last stored return number
-        return "JK2";
-    }
 
-    // Function to generate the next return number based on the last return number
-    function generateNextReturnNo(lastReturnNo) {
-        var match = lastReturnNo.match(/(\D+)(\d+)/);
-        var prefix = match[1];
-        var number = parseInt(match[2]);
-        return prefix + (number + 1);
-    }
+
+
+    <script>
+        
+// Function to format the date as "YYYY-MM-DD"
+function formatDate(date) {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+        const currentDateInput = document.getElementById("current-date");
+        currentDate = new Date();
+    
+        // Format the date as "YYYY-MM-DD" and set it in the input field
+        currentDateInput.value = formatDate(currentDate);
+    </script>
+        
+   </div>
+</div>
+
+</script>
+
+<script>
+$(document).ready(function() {
+$('#select1').on('change', function() {
+    var selectedOption = $(this).find('option:selected');
+
+    var hsn = selectedOption.data('hsn') || "";
+    var purchasePrice = selectedOption.data('price') || "";
+    var vat = selectedOption.data('tax') || "";
+
+    $('#hsn').text(hsn);
+    $('#purchasePrice').text(purchasePrice);
+    $('#vat').text(vat);
+
+    console.log('Selected item:', selectedOption.val());
+    console.log('HSN:', hsn);
+    console.log('Purchase price:', purchasePrice);
+    console.log('VAT:', vat);
+    fillItemDetails1(selectedOption);
+});
+});
 </script>
 
 <script>
     $(document).ready(function() {
-        $('#party').select2({
-            width: '450px',
-            placeholder: '-- Select/Search Party --',
-            allowClear: true // Adds a clear button to the dropdown
+        $('#select2').on('change', function() {
+            var selectedOption = $(this).find('option:selected');
+    
+            var hsn = selectedOption.data('hsn') || "";
+            var purchasePrice = selectedOption.data('price') || "";
+            var vat = selectedOption.data('tax') || "";
+    
+            $('#hsn').text(hsn);
+            $('#purchasePrice').text(purchasePrice);
+            $('#vat').text(vat);
+    
+            console.log('Selected item:', selectedOption.val());
+            console.log('HSN:', hsn);
+            console.log('Purchase price:', purchasePrice);
+            console.log('VAT:', vat);
+            fillItemDetails(selectElement);
         });
     });
-</script> -->
-// <!-- <script>
-// function closeAndOpenUnitModal() {
-//     // Close the first modal
-//     $('#itemCreateModal').modal('hide');
-
-//     // Open the second modal
-//     $('#unitmodal').modal('show');
-    
-//     // Attach an event handler to unitmodal's hidden.bs.modal event
-//     $('#unitmodal').on('hidden.bs.modal', function () {
-//         // Show the first modal when the second modal is hidden
-//         $('#itemCreateModal').modal('show');
-
-//         // Remove the event handler to avoid interference
-//         $('#unitmodal').off('hidden.bs.modal');
-//     });
-// }
-//     }
-// </script> -->
+    </script>
 <script>
-    // Get current date in the format YYYY-MM-DD
-    var currentDate = new Date().toISOString().split('T')[0];
-    
-    // Set the value of the input field to the current date
-    document.getElementById("current-date").value = currentDate;
+window.onload = function() {
+    // Get the value of count dynamically
+    var countValue = "{{ count }}";
+
+    // Function to handle confirmation and pattern validation
+    // function handleConfirmation() {
+    //     var returnNoInput = document.getElementById('return_no');
+    //     var returnNo = returnNoInput.value.trim();
+
+    //     // Define the initial pattern (e.g., numeric values only)
+    //     var initialPattern = /^\d+$/;
+
+    //     // Check if the pattern is followed (e.g., 1, 2, 3, ...)
+    //     if (!initialPattern.test(returnNo)) {
+    //         // Display a confirmation message
+    //         var confirmed = confirm('Changing the pattern will reset the return number. Are you sure you want to change the pattern?');
+
+    //         if (!confirmed) {
+    //             // Revert to the previous value
+    //             returnNoInput.value = '';
+    //             return;
+    //         }
+
+    //         // Update the initial pattern if confirmed
+    //         initialPattern = new RegExp("^" + returnNo + "$");
+
+    //         // Show a message indicating the return number has changed
+    //         document.getElementById('return-no-message').textContent = 'Return number has changed';
+    //     }
+
+    //     // Check if the pattern is followed (e.g., 1, 2, 3, ...)
+    //     if (!initialPattern.test(returnNo)) {
+    //         // Display an error message
+    //         document.getElementById('return-no-message').textContent = 'Return No. should be a numeric value';
+    //     } else {
+    //         // Clear the error message
+    //         document.getElementById('return-no-message').textContent = '';
+    //     }
+    // }
+
+    // // Listen for changes in the "Return No." field
+    // var returnNoInput = document.getElementById('return_no');
+    // returnNoInput.addEventListener('change', handleConfirmation);
+    // returnNoInput.addEventListener('keyup', handleConfirmation); // Also trigger on keyup event
+
+    // // Set the value of the input field
+    // returnNoInput.value = countValue;
+};
 </script>
 
 <script>
-    $(document).ready(function () {
-        // Event listener for the 'bill' dropdown
-        $('#bill').on('change', function () {
-            var selectedBillNo = $(this).val();
-            console.log(selectedBillNo);
-    
-            // Make an AJAX request to get the date for the selected bill number
-            $.ajax({
-                type: 'POST',
-                url: "{% url 'get_bill_date' %}",
-                data: {
-                    bill_no: selectedBillNo,
-                    csrfmiddlewaretoken: '{{ csrf_token }}',
-                },
-                success: function (dateData) {
-                    // Clear existing options in the 'bill_date' input field
-                    $('#bill_date').val(dateData.bill_date);
-                },
-                error: function () {
-                    console.log("Error occurred while fetching bill date.");
-                }
-            });
-        });
-    
-        // Trigger party selection on page load and change
-        $('#party').change(function () {
-            var selectedOption = $(this).find(':selected');
-     
-            $('#contact_number').val(selectedOption.data('contact'));
-            $('#party_address').val(selectedOption.data('address'));
-            $('#available_balance').val(selectedOption.data('openingbalance'));
-            handlePartySelection(selectedOption);
-        });
-
-        // Trigger party selection when the page loads initially
-        $('#party').trigger('change');
-    });
-</script>
-<script> 
-function handlePartySelection(selectedOption) {
-        var address = selectedOption.data("address");
-        var partyAddressGroup = $("#partyAddressGroup");
-        var partyAddressInput = $("#party_address");
-
-        console.log("Address:", address); // Check the retrieved address in the console
-
-        // Update the value of the party address input field
-        partyAddressInput.val(address);
-
-        // Check if the party has an address
-        if (address && address.trim() !== "") {
-            // Display the address section
-            partyAddressGroup.show();
-        } else {
-            // Hide the address section
-            partyAddressGroup.hide();
-        }
-
-        // Clear existing options in the bill and bill_date dropdowns
-        $('#bill').empty();
-        $('#bill_date').empty();
-    
-        // Make an AJAX request to get bill numbers and dates for the selected party
-        $.ajax({
-            type: 'POST',
-            url: "{% url 'purchasebilldata' %}",
-            data: {
-                id: selectedOption.val(), // Pass the selected party ID
-                csrfmiddlewaretoken: '{{ csrf_token }}',
-            },
-            success: function (data) {
-                if (data.bill_numbers && data.bill_dates && data.bill_numbers.length === data.bill_dates.length) {
-                    // Append bill numbers and dates to their respective dropdowns
-                    for (var i = 0; i < data.bill_numbers.length; i++) {
-                        var billNumber = data.bill_numbers[i];
-                        var billDate = data.bill_dates[i];
-    
-                        $('#bill').append($('<option>', {
-                            value: billNumber,
-                            text: billNumber
-                        }));
-    
-                        $('#bill_date').append($('<option>', {
-                            value: billDate,
-                            text: '{{ billDate|date:"d-m-Y" }}'
-                        }));
-                    }
-                    
-                    // Get the primary bill number and its date
-                    var primaryBillNo = data.bill_numbers[0];
-                    var primaryBillDate = data.bill_dates[0];
-    
-                    console.log("Primary Bill Date:", primaryBillDate);
-    
-                    // Check if primaryBillDate is not empty
-                    if (primaryBillDate !== undefined && primaryBillDate !== null && primaryBillDate !== "") {
-                        // Format the primary bill date using JavaScript
-                        var formattedPrimaryBillDate = new Date(primaryBillDate);
-                        console.log("Formatted Date:", formattedPrimaryBillDate);
-                        var formattedDate = (formattedPrimaryBillDate.getDate().toString().padStart(2, '0') + '-' + (formattedPrimaryBillDate.getMonth() + 1).toString().padStart(2, '0') + '-' + formattedPrimaryBillDate.getFullYear());
-                    } else {
-                        // If no bill dates available, set formattedDate to "NIL"
-                        var formattedDate = "NIL";
-                    }
-    
-                    // Set the primary bill number and its date as selected
-                    $('#bill').val(primaryBillNo);
-                    $('#bill_date').val(formattedDate);
-                } else {
-                    // If the lengths don't match or no data is available, add default options
-                    $('#bill').append($('<option>', {
-                        value: 'No bill',
-                        text: 'No bills available'
-                    }));
-                    $('#bill_date').append($('<option>', {
-                        value: 'No date',
-                        text: 'No dates available'
-                    }));
-                }
-            },
-            error: function () {
-                console.log("Error occurred while fetching bill numbers and dates.");
-            }
-        });
+$(document).ready(function () {
+// Event listener for party selection change
+$('#party').change(function () {
+    var selectedOption = $(this).find(':selected');
+    handlePartySelection(selectedOption);
+    if (selectedOption.data('isNewParty')) {
+        sessionStorage.clear(); // Clear session storage for new party
     }
-</script>
+});
 
-
-<script>
-    // Get all input fields with the readonly attribute
-    var readonlyFields = document.querySelectorAll('input[readonly], textarea[readonly]');
-
-    // Add a click event listener to each readonly field
-    readonlyFields.forEach(function(field) {
-        field.addEventListener('click', function() {
-            // Display a message or information to the user
-            alert('This field cannot be edited.');
-        });
-    });
-</script>
-<script>
-    function fillItemDetails1(selectElement) {
-        var selectedOption = selectElement.options[selectElement.selectedIndex];
-    
-        // Update the associated details in the row
-        var row = selectElement.closest('tr');
-        row.querySelector('span[id="hsn"]').textContent = selectedOption.getAttribute("data-hsn") || "";
-        row.querySelector('span[id="purchasePrice"]').textContent = selectedOption.getAttribute("data-price") || "";
-        row.querySelector('span[id="vat"]').textContent = selectedOption.getAttribute("data-tax") || "";
-    
-        // Reset quantity, discount, and total amount fields
-        row.querySelector('[name="item_quantity[]"]').value = 0; 
-        row.querySelector('[name="item_discount[]"]').value = 0;
-        row.querySelector('[name="item_total_amount[]"]').value = 0;
-        
-        // Reset subtotal, adjustment, and grand total fields
-        document.getElementById('subtotal').value = '0.00';
-        document.getElementById('adjustment').value = '0.00';
-        document.getElementById('grandTotal').value = '0.00';
-    
-        // Update total amount and tax amount
-        updateTotalAmount1(row.querySelector('[name="item_quantity[]"]'));
-        updateTaxAmount();
-    }
-    
-    // Function to update total amount based on quantity and discount
-    function updateTotalAmount1(inputElement) {
-        var row = inputElement.closest('tr');
-        var quantity = parseFloat(row.querySelector('[name="item_quantity[]"]').value) || 0;
-        var price = parseFloat(row.querySelector('span[id="purchasePrice"]').textContent) || 0;
-        var discount = parseFloat(row.querySelector('[name="item_discount[]"]').value) || 0;
-        
-        var totalAmount = (quantity * price) - discount;
-        row.querySelector('[name="item_total_amount[]"]').value = totalAmount.toFixed(2);
-        
-        // Update the tax amount and totals
-        updateTaxAmount();
-        updateTotals();
-    }
-    
-    document.getElementById('adjustment').addEventListener('input', function () {
-        updateTotals(); // Call the function to update Grand Total and Tax Amount
-        updateTaxAmount();
-    });
-    
-    // Function to update totals including subtotal, tax amount, and grand total
-    function updateTotals() {
-        var totalAmountFields = document.querySelectorAll('[name="item_total_amount[]"]');
-        var subtotal = 0;
-    
-        totalAmountFields.forEach(function (element) {
-            subtotal += parseFloat(element.value) || 0;
-        });
-    
-        document.getElementById('subtotal').value = subtotal.toFixed(2);
-        
-        var adjustment = parseFloat(document.getElementById('adjustment').value) || 0;
-        var taxAmount = parseFloat(document.getElementById('taxAmount').value) || 0;
-        var grandTotal = subtotal + adjustment + taxAmount;
-    
-        document.getElementById('grandTotal').value = grandTotal.toFixed(2);
-    }
-    
-    // Call the function to calculate totals when the page loads
-    document.addEventListener('DOMContentLoaded', function () {
-        // Make an AJAX request to fetch the subtotal, tax amount, and grand total from the backend
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', '/your-backend-endpoint', true); // Replace '/your-backend-endpoint' with the actual endpoint URL
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === XMLHttpRequest.DONE) {
-                if (xhr.status === 200) {
-                    var responseData = JSON.parse(xhr.responseText);
-                    // Extract subtotal, tax amount, and grand total from the response data
-                    var subtotalValueFromServer = parseFloat(responseData.subtotal) || 0;
-                    var taxAmountValueFromServer = parseFloat(responseData.taxAmount) || 0;
-                    var grandTotalValueFromServer = parseFloat(responseData.grandTotal) || 0;
-    
-                    // Set subtotal, tax amount, and grand total input field values
-                    document.getElementById('subtotal').value = subtotalValueFromServer.toFixed(2);
-                    document.getElementById('taxAmount').value = taxAmountValueFromServer.toFixed(2);
-                    document.getElementById('grandTotal').value = grandTotalValueFromServer.toFixed(2);
-                    
-                    // Trigger any necessary calculations or updates dependent on these values
-                    updateTotals(); // Assuming this function recalculates totals based on the fetched values
-                } else {
-                    console.error('Failed to fetch data from the backend');
-                }
-            }
-        };
-        xhr.send();
-    
-        // Add event listeners to quantity and discount inputs for dynamic updating
-        document.querySelectorAll('[name="item_quantity[]"], [name="item_discount[]"]').forEach(function(element) {
-            element.addEventListener('input', function () {
-                updateTotalAmount1(this);
-            });
-        });
-    });
-    
-    function updateTaxAmount() {
-    var rows = document.querySelectorAll('.table tbody tr');
-    var taxAmount = 0;
-
-    rows.forEach(function (row) {
-        var quantityInput = row.querySelector('[name="item_quantity[]"]');
-        var discountInput = row.querySelector('[name="item_discount[]"]');
-        var vatSpan = row.querySelector('span[id^="vat"]');
-        var priceSpan = row.querySelector('span[id^="purchasePrice"]');
-
-        if (quantityInput && discountInput && vatSpan && priceSpan) {
-            var quantity = parseFloat(quantityInput.value);
-            var discount = parseFloat(discountInput.value);
-            var vatText = vatSpan.textContent.trim();
-            var itmVat = parseFloat(vatText.match(/\d+/)) || 0; // Extract the numeric part from the VAT text
-            var priceText = priceSpan.textContent.trim();
-            var price = parseFloat(priceText) || 0;
-
-            var rowTaxAmount = (quantity * price - discount) * (itmVat / 100);
-            taxAmount += rowTaxAmount;
-
-            console.log("Quantity:", quantity);
-            console.log("VAT for Row:", itmVat);
-            console.log("Price for Row:", price);
-            console.log("Discount for Row:", discount);
-            console.log("Row Tax Amount:", rowTaxAmount);
-        } else {
-            console.error("One or more elements not found in row:", row);
-        }
-    });
-
-    document.getElementById('taxAmount').value = taxAmount.toFixed(2);
-    console.log("Tax Amount Value Set:", taxAmount.toFixed(2));
-    updateTotals();
+// Check if it's the first load or a reload
+var isFirstLoad = sessionStorage.getItem('isFirstLoad');
+if (!isFirstLoad) {
+    // Set default values for input fields
+    $('#contact_number, #addressa, #available_balance, #bill, #bill_date').val('');
+    sessionStorage.setItem('isFirstLoad', true); // Mark as first load
 }
-// Add event listeners to quantity inputs for dynamic updating
-document.querySelectorAll('[name="item_quantity[]"]').forEach(function(element) {
-    element.addEventListener('input', function () {
-        console.log("Quantity changed");
-        updateTotalAmount1(this);
-        updateTaxAmount();
-        updateTotals();
+
+// Trigger party selection when the page loads initially
+$('#party').trigger('change');
+
+// Event listener for the 'bill' dropdown change
+$('#bill').on('change', function () {
+    var selectedBillNo = $(this).val();
+    $.ajax({
+        type: 'POST',
+        url: "{% url 'get_bill_date' %}",
+        data: {
+            bill_no: selectedBillNo,
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+        },
+        success: function (dateData) {
+            $('#bill_date').val(dateData.bill_date); // Set bill date
+        },
+        error: function () {
+            console.log("Error occurred while fetching bill date.");
+        }
     });
 });
-    </script>
- <script>
-    // Initialize select2 after the page loads
-    $(document).ready(function() {
-        $('#select1').select2({
-            placeholder: 'Another Select Product',
-            allowClear: true,
-            width: '100%',
-        });
-        $('.#select1').val(null).trigger('change');
+});
+
+// Function to handle party selection
+function handlePartySelection(selectedOption) {
+if (selectedOption) {
+    // Check if there's an address associated with the selected party
+    var address = selectedOption.data("addressa");
+    var addressSection = $("#addressSection");
+
+    console.log("Address:", address); // Check the retrieved address in the console
+    
+    if (address && address.trim() !== "") {
+        // Display the address section
+        addressSection.show();
+    } else {
+        // Hide the address section
+        addressSection.hide();
+    }
+
+    $.ajax({
+        type: 'POST',
+        url: "{% url 'additional_party_details' %}",
+        data: {
+            id: selectedOption.val(),
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+        },
+        success: function (data) {
+            console.log("AJAX success - Address from server:", data.address); // Debugging
+            $('#contact_number').val(data.contact);
+            $('#addressa').val(data.address);
+            $('#available_balance').val(data.balance); // Show/hide address section based on data.address
+            if (data.address && data.address.trim() !== "") {
+                addressSection.show();
+            } else {
+                addressSection.hide();
+            }
+        
+        },
+        error: function () {
+            console.log("Error occurred while fetching additional party details.");
+        }
     });
+    // Function to validate party selection
+function validatePartySelection() {
+var partyDropdown = $('#party');
+var selectedParty = partyDropdown.val();
+if (!selectedParty) {
+    $('#partyError').text("Please select a party");
+    return false; // Prevent form submission
+} else {
+    $('#partyError').text(""); // Clear error message if party is selected
+    handlePartySelection(); // Call the function to fetch additional party details
+    return true; // Allow form submission
+}
+}
+
+// Form submission handler
+$('form').submit(function() {
+// Validate party selection
+return validatePartySelection();
+});
+// Function to validate item selection
+function validateItemSelection() {
+var selectedItem = $('#select1').val();
+if (!selectedItem) {
+    $('#itemError').text("Please select an item");
+    return false; // Prevent form submission
+} else {
+    $('#itemError').text(""); // Clear error message if item is selected
+    return true; // Allow form submission
+}
+}
+
+// Form submission handler
+$('form').submit(function() {
+// Validate party selection
+var isPartySelected = handlePartySelection();
+
+// Validate item selection
+var isItemSelected = validateItemSelection();
+
+// Allow form submission only if both party and item are selected
+return isPartySelected && isItemSelected;
+});
+    // Populate bill dropdown
+    var billDropdown = $("#bill");
+    var billDateDropdown = $("#bill_date");
+    // AJAX request to get bill numbers and dates for the selected party
+    $.ajax({
+        type: 'POST',
+        url: "{% url 'purchasebilldata' %}",
+        data: {
+            id: selectedOption.val(),
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+        },
+        success: function (data) {
+            if (data.bill_numbers && data.bill_dates && data.bill_numbers.length === data.bill_dates.length) {
+                billDropdown.empty();
+                billDateDropdown.empty();
+                for (var i = 0; i < data.bill_numbers.length; i++) {
+                    var billNumber = data.bill_numbers[i];
+                    var billDate = data.bill_dates[i];
+                    billDropdown.append($('<option>', { value: billNumber, text: billNumber }));
+                    billDateDropdown.append($('<option>', { value: billDate, text: '{{ billDate|date:"d-m-Y" }}' }));
+                }
+                var primaryBillNo = data.bill_numbers[0];
+                var primaryBillDate = data.bill_dates[0];
+                var formattedDate = primaryBillDate ? new Date(primaryBillDate).toLocaleDateString('en-GB') : "NIL";
+                $('#bill').val(primaryBillNo);
+                $('#bill_date').val(formattedDate);
+            } else {
+                billDropdown.append($('<option>', { value: 'No bill', text: 'No bills available' }));
+                billDateDropdown.append($('<option>', { value: 'No date', text: 'No dates available' }));
+            }
+        },
+        error: function () {
+            console.log("Error occurred while fetching bill numbers and dates.");
+        }
+    });
+
+}
+}
+
+// Function to handle the creation of a new party
+function handleNewPartyCreation(newParty) {
+    var dropdown = $('#party')
+    var option = $('<option>', { 
+    value: newParty.id, 
+    text: newParty.name, 
+    'data-contact': newParty.contact, 
+    'data-address': newParty.address, 
+    'data-openingbalance': newParty.openingbalance
+    });
+dropdown.append(option);
+$('#contact_number').val(newParty.contact);
+$('#addressa').val(newParty.address);
+$('#available_balance').val(newParty.openingbalance);
+
+// Show the address section and update the address textarea
+$("#addressSection").show(); 
+$('#addressa').val(newParty.address);
+
+console.log('New party contact:', newParty.contact);
+console.log('New party address:', newParty.address);
+console.log('New party opening balance:', newParty.openingbalance);
+}
+// Handle change event when a party is selected
+$('#party').change(function () {
+// Get the selected party option
+var selectedOption = $(this).find(':selected');
+
+// Call the function to handle party selection
+handlePartySelection(selectedOption);
+});
+
+// Trigger party selection when the page loads initially
+$('#party').trigger('change');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+<script>
+
+
+
+
+
+
+
+
+
+
+
+
+// Function to fill item details based on the selected option
+function fillItemDetails1(selectElement) {
+    if (!selectElement || !selectElement.options) {
+        console.error('Invalid select element:', selectElement);
+        return;
+    }
+
+    var selectedOption = selectElement.options[selectElement.selectedIndex];
+    if (!selectedOption) {
+        console.error('No selected option:', selectElement.selectedIndex);
+        return;
+    }
+
+    var hsn = selectedOption.getAttribute("data-hsn") || "";
+    var purchasePrice = selectedOption.getAttribute("data-price") || "";
+    var vat = selectedOption.getAttribute("data-tax") || "";
+    var vatRate = parseFloat(vat.match(/\d+/)) || 0;
+
+    console.log('HSN:', hsn);
+    console.log('Purchase price:', purchasePrice);
+    console.log('VAT:', vat);
+
+    var row = selectElement.closest('tr');
+    console.log('Row:', row);
+
+    if (row) {
+        row.querySelector('span[id="hsn"]').textContent = hsn;
+        row.querySelector('span[id="purchasePrice"]').textContent = purchasePrice;
+        row.querySelector('span[id="vat"]').textContent = vat;
+        updateTaxAmount();
+    }
+}
+ 
+// Function to update total amount based on input changes
+function updateTotalAmount1(inputElement) {
+    var row = inputElement.closest('tr');
+
+    var quantity = parseFloat(row.querySelector('[name="item_quantity[]"]').value) || 0;
+    var price = parseFloat(row.querySelector('#purchasePrice').innerText) || 0;
+    var discount = parseFloat(row.querySelector('[name="item_discount[]"]').value) || 0;
+
+    var totalAmount = (quantity * price) - discount;
+
+    row.querySelector('[name="item_total_amount[]"]').value = totalAmount.toFixed(2);
+}
+
+// Add event listener to the Adjustment input for dynamic updating
+document.getElementById('adjustment').addEventListener('input', function () {
+    updateTotals(); // Call the function to update Grand Total and Tax Amount
+    updateTaxAmount();
+});
+
+// Initialize Select2 after the page loads
+$(document).ready(function() {
+    $('#select1').select2({
+        placeholder: 'Another Select Product',
+        allowClear: true,
+        width: '100%',
+    });
+    $('.#select1').val(null).trigger('change');
+});
+</script>
+<script>
+$(document).ready(function() {
+    $('.select2').on('change', function() {
+        var selectedOption = $(this).find('option:selected');
+
+        var hsn = selectedOption.data('hsn') || "";
+        var purchasePrice = selectedOption.data('price') || "";
+        var vat = selectedOption.data('tax') || "";
+
+        $('#hsn').text(hsn);
+        $('#purchasePrice').text(purchasePrice);
+        $('#vat').text(vat);
+
+        console.log('Selected item:', selectedOption.val());
+        console.log('HSN:', hsn);
+        console.log('Purchase price:', purchasePrice);
+        console.log('VAT:', vat);
+        fillItemDetails(selectedOption);
+    });
+});
 </script>
 
 <script>
-    function addRow() {
-        // Get the table body
-        var tableBody = document.querySelector('.table tbody');
 
-        // Create a new row
-        var newRow = tableBody.insertRow();
-        newRow.classList.add('new-row')
-        
-        // Cell 1: Counter
-        var cell1 = newRow.insertCell(0);
-        cell1.innerHTML = tableBody.rows.length; // Set the row number
+function addRow() {
+    // Get the table body
+    var tableBody = document.querySelector('.table tbody');
 
-        // Cell 2: Product Dropdown
-        var cell2 = newRow.insertCell(1);
-        cell2.innerHTML = '<div style="display: flex; position: relative;">' +
-            '<select name="selected_item[]" onchange="fillItemDetails(this, this.parentNode.parentNode)" style="width: 120px;" class="form-control select2" id="select1">' +
-            '<option value="">-Select-</option>' +
-            '{% for item in items %}' +
-            '<option value="{{ item.id }}" data-hsn="{{ item.itm_hsn }}" data-price="{{ item.itm_purchase_price }}" data-tax="VAT {{ item.itm_vat|floatformat:0 }}%">{{ item.itm_name }}</option>' +
-            '{% endfor %}' +
-            '</select>' +
-            '<a href="#" class="btn btn-outline-secondary" style="background-color: maroon; height: 40px; width: 30px; text-align: center; padding: 2px; position: absolute; right: 0; font-size: 20px; margin-left: 280px;" data-toggle="modal" data-target="#itemCreateModal"><b>+</b></a>'+
-            '</div>';
+    // Create a new row
+    var newRow = tableBody.insertRow();
+    newRow.classList.add('new-row');
 
-        // Cell 3: HSN
-        var cell3 = newRow.insertCell(2);
-        cell3.innerHTML = '<span id="hsn' + tableBody.rows.length + '" class="form-control" style="height: 40px; width: 90px;"></span>';
+    // Cell 1: Counter
+    var cell1 = newRow.insertCell(0);
+    cell1.innerHTML = tableBody.rows.length; // Set the row number
 
-        // Cell 4: Quantity
-        var cell4 = newRow.insertCell(3);
-        cell4.innerHTML = '<input type="number" name="item_quantity[]" required style="width: 90px;" class="form-control" value="0" oninput="updateTotalAmount(this); updateTotals(this); updateTaxAmount(this);">';
+    var select=document.getElementById('select1').innerHTML;
+    console.log(select);
+    // Cell 2: Product Dropdown
+    var cell2 = newRow.insertCell(1);
+    cell2.innerHTML = '<div style="display: flex; position: relative;">' +
+        '<select name="selected_item[]" onchange="fillItemDetails(this, this.parentNode.parentNode)" style="width: 120px;" class="form-control select2" id="select1">' +
+            select+
+        // '<option value="">-Select-</option>' +
+        // '{% for item in items %}' +
+        // '<option value="{{ item.id }}" data-hsn="{{ item.itm_hsn }}" data-price="{{ item.itm_purchase_price }}" data-tax="{{ item.itm_vat|floatformat:0 }}">{{ item.itm_name }}</option>' +
+        // '{% endfor %}' +
+        '</select>' +
+        '<a href="#" class="btn btn-outline-secondary" style="background-color: maroon; height: 40px; width: 30px; text-align: center; padding: 2px; position: absolute; right: 0; font-size: 20px; margin-left: 280px;" data-toggle="modal" data-target="#itemCreateModal"><b>+</b></a>' +
+        '</div>';
 
-        // Cell 5: Purchase Price
-        var cell5 = newRow.insertCell(4);
-        cell5.innerHTML = '<span id="purchasePrice' + tableBody.rows.length + '" style="width: 90px; height: 40px;" class="form-control" name="purchaseprice[]"></span>';
+    // Cell 3: HSN
+    var cell3 = newRow.insertCell(2);
+    cell3.innerHTML = '<span id="hsn' + tableBody.rows.length + '" class="form-control" style="height: 40px; width: 90px;"></span>';
 
-        // Cell 6: VAT
-        var cell6 = newRow.insertCell(5);
-        cell6.innerHTML = '<span id="vat' + tableBody.rows.length + '" style="width: 90px; height: 40px;" class="form-control"></span>';
+    // Cell 4: Quantity
+    var cell4 = newRow.insertCell(3);
+    cell4.innerHTML = '<input type="number" name="item_quantity[]" style="width: 90px;" class="form-control" value="0" oninput="updateTotalAmount(this);updateTotals(this); updateTaxAmount(this);" required>';
 
-        // Cell 7: Discount
-        var cell7 = newRow.insertCell(6);
-        cell7.innerHTML = '<input type="number" name="item_discount[]" class="form-control" style="width: 80px;" value="0" oninput="updateTotalAmount(this); updateTotals(this); updateTaxAmount(this);">';
+    // Cell 5: Purchase Price
+    var cell5 = newRow.insertCell(4);
+    cell5.innerHTML = '<span id="purchasePrice' + tableBody.rows.length + '" style="width: 90px; height: 40px;" class="form-control" name="purchaseprice[]"></span>';
 
-        // Cell 8: Total Amount
-        var cell8 = newRow.insertCell(7);
-        cell8.innerHTML = '<input type="number" name="item_total_amount[]" readonly class="form-control" style="width: 100px;" value="0">';
+    // Cell 6: VAT
+    var cell6 = newRow.insertCell(5);
+    cell6.innerHTML = '<span id="vat' + tableBody.rows.length + '" style="width: 90px; height: 40px;" class="form-control"></span>';
 
-        var cell9 = newRow.insertCell(8);
-        cell9.innerHTML = '<i class="fas fa-trash-alt fa-lg delete-row" style="margin-left: 10px;"></i>';
+    // Cell 7: Discount
+    var cell7 = newRow.insertCell(6);
+    cell7.innerHTML = '<input type="number" name="item_discount[]" class="form-control" style="width: 80px;" value="0" oninput="updateTotalAmount(this);updateTotals(this); updateTaxAmount(this);">';
 
-        // Add an event listener to the new product dropdown for dynamic updates
-        var newSelect = cell2.querySelector('select[name="selected_item[]"]');
-        newSelect.addEventListener('change', function() {
-            fillItemDetails(newSelect, newRow);
-        });
-                // Add an event listener to the new discount input for dynamic updating
-        var newDiscountInput = cell7.querySelector('[name="item_discount[]"]');
-        newDiscountInput.addEventListener('input', function () {
-            updateTotalAmount1(newDiscountInput);
-            updateTotals();
-            updateTaxAmount();
-        });
+    // Cell 8: Total Amount
+    var cell8 = newRow.insertCell(7);
+    cell8.innerHTML = '<input type="number" name="item_total_amount[]" readonly class="form-control" style="width: 100px;" value="0">';
 
+    var cell9 = newRow.insertCell(8);
+    cell9.innerHTML = '<i class="fas fa-trash-alt fa-lg delete-row" style="margin-left: 10px;"></i>';
 
-     
-       // Increment IDs and update the new row
+    // Add event listeners for dynamically added elements
+    var newSelect1 = newRow.querySelector('#select1');
+    var newSelect2 = newRow.querySelector('.select2');
+    var newDiscountInput = newRow.querySelector('[name="item_discount[]"]');
+
+    // Event listener for select1 dropdown
+    newSelect1.addEventListener('change', function () {
+        fillItemDetails(newSelect1, newRow);
+    });
+
+    // Event listener for select2 dropdown
+    $(newSelect2).on('change', function () {
+        var selectedOption = $(this).find('option:selected');
+        var hsn = selectedOption.data('hsn') || "";
+        var purchasePrice = selectedOption.data('price') || "";
+        var vat = selectedOption.data('tax') || "";
+        $('#hsn' + newRow.rowIndex).text(hsn);
+        $('#purchasePrice' + newRow.rowIndex).text(purchasePrice);
+        $('#vat' + newRow.rowIndex).text(vat);
+        updateTaxAmount();
+        fillItemDetails(selectedOption);
+    });
+
+    // Event listener for discount input
+    newDiscountInput.addEventListener('input', function () {
+        updateTotalAmount1(newDiscountInput);
+        updateTotals();
+    });
+
+    // Reload item dropdown to update options
+    reloadItem();
+
+    // Update IDs for the new row
     updateRowIds(newRow);
-
-// Call updateTaxAmount() after adding a new row
-updateTaxAmount();
-
-// Log the values for the new row
-console.log("New Row:", tableBody.rows.length);
-console.log("Purchase Price:", newRow.querySelector('span[id^="purchasePrice"]').textContent);
-console.log("Discount:", newRow.querySelector('[name="item_discount[]"]').value);
-console.log("Item VAT:", newRow.querySelector('span[id^="vat"]').textContent);
 }
 
-   // Function to increment IDs and update the new row
-    function updateRowIds(row) {
-        var rowCount = document.querySelectorAll('.table tbody tr').length;
+// Function to increment IDs and update the new row
+function updateRowIds(row) {
+    var rowCount = document.querySelectorAll('.table tbody tr').length;
 
-        // Update IDs for the new row
-        row.querySelector('span[id^="hsn"]').id = 'hsn' + rowCount;
-        row.querySelector('span[id^="purchasePrice"]').id = 'purchasePrice' + rowCount;
-        row.querySelector('span[id^="vat"]').id = 'vat' + rowCount;
-        row.classList.add('new-row');
-
-        updateTotals();
-        updateTaxAmount();
-    }
- </script>
-<script>
-    function fillItemDetails(selectElement, row) {
+    // Update IDs for the new row
+    row.querySelector('span[id^="hsn"]').id = 'hsn' + rowCount;
+    row.querySelector('span[id^="purchasePrice"]').id = 'purchasePrice' + rowCount;
+    row.querySelector('span[id^="vat"]').id = 'vat' + rowCount;
+    row.classList.add('new-row');
+}
+   function fillItemDetails(selectElement, row) {
         // Get the selected option
         var selectedOption = selectElement.options[selectElement.selectedIndex];
 
@@ -1726,11 +1956,7 @@ console.log("Item VAT:", newRow.querySelector('span[id^="vat"]').textContent);
 
         updateTotals();
         updateTaxAmount();
-        
-    
-
-      
-    }
+   }
 
     function updateTotalAmount(inputElement) {
     // Get the parent row
@@ -1750,8 +1976,8 @@ updateTotals();
     }
 
 
-
-
+</script>
+<script>
 $(document).ready(function () {
     // Delete row when delete icon is clicked
     $(document).on('click', '.delete-row', function () {
@@ -1760,13 +1986,11 @@ $(document).ready(function () {
 
         // Update the row numbers after deletion
         updateRowNumbers();
-        updateTotals();
-        updateTaxAmount();
     });
-}); 
+});
 
-
- function updateRowNumbers() {
+// Function to update row numbers after deletion
+function updateRowNumbers() {
     // Get all rows in the table body
     var rows = document.querySelectorAll('.table tbody tr');
 
@@ -1774,12 +1998,96 @@ $(document).ready(function () {
     rows.forEach(function (row, index) {
         row.cells[0].innerText = index + 1;
     });
-  }
- </script> 
+}
+function updateTotals() {
+    // Get all total amount input fields
+    var totalAmountFields = document.querySelectorAll('[name="item_total_amount[]"]');
+    var subtotal = 0;
+
+    // Calculate subtotal
+    totalAmountFields.forEach(function (element) {
+        subtotal += parseFloat(element.value) || 0;
+    });
+
+    // Update subtotal input field
+    document.getElementById('subtotal').value = subtotal.toFixed(2);
+
+    var adjustment = parseFloat(document.getElementById('adjustment').value) || 0;
+
+    var taxAmount = parseFloat(document.getElementById('taxAmount').value) || 0;
+
+    var grandTotal = subtotal + adjustment + taxAmount;
+
+    // Update grand total input field
+    document.getElementById('grandTotal').value = grandTotal.toFixed(2);
+}
+    // Function to set default values when the page loads
+    document.addEventListener('DOMContentLoaded', function () {
+    // Get all quantity, discount, and total amount input fields
+    var quantityFields = document.querySelectorAll('[name="item_quantity[]"]');
+    var discountFields = document.querySelectorAll('[name="item_discount[]"]');
+    var totalAmountFields = document.querySelectorAll('[name="item_total_amount[]"]');
+    var selectElements = document.querySelectorAll('[name="selected_item[]"]');
+
+    // Set default values to 0
+    quantityFields.forEach(function (element) {
+        element.value = 0;
+    });
+
+    discountFields.forEach(function (element) {
+        element.value = 0;
+    });
+
+    totalAmountFields.forEach(function (element) {
+        element.value = 0;
+    });
+
+    // Set other default values or call additional initialization functions if needed
+    document.getElementById('subtotal').value = '0.00';
+    document.getElementById('grandTotal').value = '0.00';
+    document.getElementById('taxAmount').value = '0.00';
+    document.getElementById('adjustment').value = '0.00';
+
+    // Reset select options
+    selectElements.forEach(function (selectElement) {
+        selectElement.selectedIndex = 0;
+    });
+
+    // Trigger the updateTotals function to recalculate subtotal, grand total, and tax amount
+    updateTotals();
+
+    console.log("Page Loaded");
+});
+
+function updateTaxAmount() {
+ 
+ var rows = document.querySelectorAll('.table tbody tr');
+
+ var taxAmount = 0;
+
+ rows.forEach(function (row) {
+     console.log('hai');
+     var quantity = parseFloat(row.querySelector('[name="item_quantity[]"]').value) ;
+
+     var discount = parseFloat(row.querySelector('[name="item_discount[]"]').value) ;
 
 
+     var itmVat =(row.querySelector('select[name="selected_item[]"]').selectedOptions[0].getAttribute('data-tax')).replace(/[^\d.]/g, '') || 0;
+     var price = parseFloat(row.querySelector('select[name="selected_item[]"]').selectedOptions[0].getAttribute('data-price')) || 0;
+     console.log(itmVat);
+     console.log(price,"hai");
+
+     var rowTaxAmount = (quantity * price - discount) * (itmVat / 100);
+     taxAmount += rowTaxAmount;
+ });
+
+ document.getElementById('taxAmount').value = taxAmount.toFixed(2);
+ console.log(taxAmount);
 
 
-   </body>   
-
+ updateTotals();
+}
+</script>
+   </body>
+            
 {% endblock %}

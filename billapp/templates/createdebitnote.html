@@ -209,7 +209,7 @@
 
 <div class="body-wrapper">
     <div class="container-fluid">
-        <form action="{% url 'save_debit_note' %}" method="post" enctype="multipart/form-data">
+        <form action="{% url 'save_debit_note' %}" method="post" enctype="multipart/form-data" id="myForm">
             {% csrf_token %}
             <h1 class="mb-4">DEBIT NOTE</h1>
      
@@ -342,7 +342,7 @@
                                     <select name="selected_item[]" onchange="fillItemDetails1(this)" class="form-control select2" id="select1">
                                         <option value="">-Select-</option>
                                         {% for item in items %}
-                                            <option value="{{ item.id }}" data-hsn="{{ item.itm_hsn }}" data-price="{{ item.itm_purchase_price }}" data-tax=" {{ item.itm_vat }}">{{ item.itm_name }}</option>
+                                            <option value="{{ item.id }}" data-hsn="{{ item.itm_hsn }}" data-price="{{ item.itm_purchase_price }}" data-tax="{{ item.itm_vat }}">{{ item.itm_name }}</option>
                                         {% endfor %}
                                     </select>
                                     
@@ -537,6 +537,7 @@
                                                        <option value="Packages">Packages</option>
                                                        <option value="Box">Box</option>
                                                        {% for i in units %}
+                                                       <p>{{ i.unit_name }}</p>
                                                        <option value="{{ i.unit_name }}">{{ i.unit_name }}</option>
                                                        {% endfor %}
                                                    </select>
@@ -770,17 +771,7 @@
                     drop.append($('<option></option>').attr('value', value[0]).attr('data-hsn', value[2]).attr('data-price', value[3]). attr('data-tax', value[4]).text(value[1]));
                 });
 
-                // 0: 17
-                //                 ​​
-                //                 1: "Tomato"
-                //                 ​​
-                //                 2: 444456
-                //                 ​​
-                //                 3: 424
-                //                 ​​
-                //                 4: "5"
-                //                 ​​
-                //                 length: 5
+                
 
                 if (optionExists) {
                     drop.val(existingVal);
@@ -803,6 +794,7 @@ function validateHSN(hsn) {
     }
 }
 
+
 $(document).ready(function() {
     $('#itemHSN').blur(function() {
         var hsn = $(this).val();
@@ -822,6 +814,7 @@ $(document).ready(function() {
         });
     });
 });
+
  // Event handler for change in item name
  $(document).on('change', '[id^=item_name_]', function () {
         var rowId = $(this).attr('id').split('_')[2]; // Extract the row number from the ID
@@ -885,58 +878,90 @@ $(document).ready(function() {
         
         $('#tax_amount_' + rowId).val(taxAmount.toFixed(2));
     });
-</script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("myForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent default form submission
 
-
-   <script>
-    $(document).ready(function () {
-      
-       
-    
-$("#unitmodalsubmit").click(function () {
-    // Get the unit name from the input field
-    var unitName = $('#unit_name').val();
-
-    // Check if the unit name already exists in the dropdown
-    if ($('#unit option').filter(function () {
-        return $(this).text().toLowerCase() === unitName.toLowerCase();
-    }).length > 0) {
-        // If the unit already exists, show an alert
-        alert("Unit already exists!");
-        $('#unit_name').val('');
-        return; // Exit the function to prevent further execution
-    }
-
-    $.ajax({
-        type: "POST",
-        url: "{% url 'create_unit1' %}",
-        data: {
-            unit_name: unitName
-        },
-        beforeSend: function (xhr, settings) {
-            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
-        },
-        success: function (response) {
-            // Close the modal
-            $('#unitmodal').hide();
-            $(".modal-backdrop").remove();
-            // Clear the input field
-            $('#unit_name').val('');
-            // Add the new unit to the dropdown
-            $('#unit').append($('<option>', {
-        value: response.id,
-        text: response.unit_name
-    }).text(response.unit_name));
-            // Provide feedback to the user
-            console.log("Unit added successfully!");
-            alert("Unit added successfully!");
-        },
-        error: function (xhr, textStatus, errorThrown) {
-            console.error("Error adding unit:", errorThrown);
+        if (validateForm()) {
+            this.submit(); // If validation passes, submit the form
         }
     });
 });
+
+function validateForm() {
+    var quantityInputs = document.getElementsByName("item_quantity[]");
+
+    for (var i = 0; i < quantityInputs.length; i++) {
+        var quantityInput = quantityInputs[i];
+
+        // Check if the quantity input value is empty, 0, or less than zero
+        if (quantityInput.value.trim() === '' || parseFloat(quantityInput.value) <= 0) {
+            alert("Please enter a quantity greater than zero for each item.");
+            quantityInput.focus(); // Focus on the input field with the invalid quantity
+            return false; // Prevent form submission
+        }
+    }
+
+    return true; // Allow form submission if all quantities are greater than zero
+}
+
+    
+
+
+</script>
+
+
+   <script>$(document).ready(function () {
+    $("#unitmodalsubmit").click(function () {
+        // Get the unit name from the input field
+        var unitName = $('#unit_name').val();
+
+        // Check if the unit name is null or empty
+        if (!unitName) {
+            alert("Unit name cannot be empty!");
+            return;
+        }
+
+        // Check if the unit name already exists in the dropdown
+        if ($('#unit option').filter(function () {
+            return $(this).text().toLowerCase() === unitName.toLowerCase();
+        }).length > 0) {
+            // If the unit already exists, show an alert
+            alert("Unit already exists!");
+            $('#unit_name').val('');
+            return; // Exit the function to prevent further execution
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'create_unit1' %}",
+            data: {
+                unit_name: unitName
+            },
+            beforeSend: function (xhr, settings) {
+                xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+            },
+            success: function (response) {
+                // Close the modal
+                $('#unitmodal').hide();
+                $(".modal-backdrop").remove();
+                // Clear the input field
+                $('#unit_name').val('');
+                // Add the new unit to the dropdown
+                $('#unit').append($('<option>', {
+                    value: response.id,
+                    text: response.unit_name
+                }).text(response.unit_name));
+                // Provide feedback to the user
+                console.log("Unit added successfully!");
+                alert("Unit added successfully!");
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.error("Error adding unit:", errorThrown);
+            }
+        });
     });
+});
 
 </script>
 
