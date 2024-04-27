@@ -342,7 +342,7 @@
                                     <select name="selected_item[]" onchange="fillItemDetails1(this)" class="form-control select2" id="select1">
                                         <option value="">-Select-</option>
                                         {% for item in items %}
-                                            <option value="{{ item.id }}" data-hsn="{{ item.itm_hsn }}" data-price="{{ item.itm_purchase_price }}" data-tax="{{ item.itm_vat }}">{{ item.itm_name }}</option>
+                                            <option value="{{ item.id }}" data-hsn="{{ item.itm_hsn }}" data-price="{{ item.itm_purchase_price }}" data-tax=" {{ item.itm_vat }}">{{ item.itm_name }}</option>
                                         {% endfor %}
                                     </select>
                                     
@@ -911,7 +911,98 @@ function validateForm() {
 </script>
 
 
-   <script>$(document).ready(function () {
+<script>
+    // Get all input fields, select dropdowns, and radio buttons
+    const fieldsToValidate = document.querySelectorAll('input[type="text"], input[type="number"], select, input[type="radio"]');
+    
+    function validateFields() {
+    let emptyFieldCount = 0; // Variable to count empty fields
+
+    // Iterate through each field
+    fieldsToValidate.forEach(field => {
+        // Skip validation for item name and HSN
+        if (field.id !== "itemName" && field.id !== "itemHSN") {
+            // For radio buttons, check if any option is selected
+            if (field.type === "radio") {
+                const radioName = field.name;
+                const radioGroup = document.getElementsByName(radioName);
+                let isRadioChecked = false;
+
+                // Iterate through radio options to check if any is checked
+                radioGroup.forEach(radio => {
+                    if (radio.checked) {
+                        isRadioChecked = true;
+                    }
+                });
+
+                // If no radio option is checked, increment emptyFieldCount
+                if (!isRadioChecked) {
+                    emptyFieldCount++;
+                }
+            } else if (field.tagName === "SELECT") {
+                // For select dropdowns, check if any option is selected
+                if (!field.value) {
+                    emptyFieldCount++;
+                }
+            } else {
+                // For text input and number input fields, check if they're empty
+                if (!field.value.trim()) {
+                    emptyFieldCount++;
+                }
+            }
+        }
+    });
+
+    // Display appropriate alert message(s)
+    if (emptyFieldCount > 3) {
+        alert("Please fill all details");
+        return false;
+    } else {
+        fieldsToValidate.forEach(field => {
+            // Skip validation for item name and HSN
+            if (field.id !== "itemName" && field.id !== "itemHSN") {
+                if (field.type === "radio") {
+                    const radioName = field.name;
+                    const radioGroup = document.getElementsByName(radioName);
+                    let isRadioChecked = false;
+
+                    // Iterate through radio options to check if any is checked
+                    radioGroup.forEach(radio => {
+                        if (radio.checked) {
+                            isRadioChecked = true;
+                        }
+                    });
+
+                    // If no radio option is checked, display alert
+                    if (!isRadioChecked) {
+                        alert("Please select an option for " + radioName);
+                    }
+                } else if (field.tagName === "SELECT") {
+                    // For select dropdowns, check if any option is selected
+                    if (!field.value) {
+                        alert("Please select an option for " + field.id);
+                    }
+                } else {
+                    // For text input and number input fields, check if they're empty
+                    if (!field.value.trim()) {
+                        alert("Please fill out the field for " + field.id);
+                    }
+                }
+            }
+        });
+        return true;
+    }
+}
+    // Event listener for form submission
+    document.getElementById('itemcreate').addEventListener('click', function(event) {
+        // Prevent form submission if any field is invalid
+        if (!validateFields()) {
+            event.preventDefault();
+        }
+    });
+    
+   
+   $(document).ready(function () {
     $("#unitmodalsubmit").click(function () {
         // Get the unit name from the input field
         var unitName = $('#unit_name').val();
@@ -1012,7 +1103,8 @@ function validateForm() {
                            <div class="col-md-9 row" style="margin-top: 3vw;">
                                <div class="col-md-4">
                                    <input type="text" style="background-color: white;" class="form-control" id="partyname" name="partyname" placeholder="Party Name" required>
-                               </div>                
+                                   <span id="partyname-validation" style="color: red;"></span>
+                                </div>                
                                <div class="col-md-4" style="position: relative;">
                                 <input required type="text" style="background-color: white;" class="form-control" id="trn_no" name="trn_no" placeholder="TRN NO" oninput="validateGSTIN(this)">
                                 <span id="gstno-validation" style="position: absolute; right: 14px; top: 8px;"></span>
@@ -1099,7 +1191,7 @@ function validateForm() {
                
                       
                        <div class="modal-footer">
-                           <button type="button" class="btn btn-primary save-button" onclick="saveParty()" style="background-color: #68020F; ;">Save</button>
+                           <button type="button" class="btn btn-primary save-button" id="saveparty" onclick="saveParty()" style="background-color: #68020F; ;">Save</button>
                       
                   
                        </div>
@@ -1112,8 +1204,13 @@ function validateForm() {
    </div>
    <script>
        
-   function saveParty() {
-   
+   function saveParty() 
+   {
+        if (!validatePartyName()) {
+            // Return false if validation fails
+            return false;
+        }
+
        const partyName = document.getElementById('partyname').value;
        const trnNo = document.getElementById('trn_no').value;
        const contact = document.getElementById('contact').value;
@@ -1331,6 +1428,32 @@ function addToDropdown(data, response) {
        window.onload = clearFieldsOnLoad;
    </script>
 
+
+
+
+<script>
+    function validatePartyName() {
+        const partyName = document.getElementById('partyname').value.trim();
+        const validationSpan = document.getElementById('partyname-validation');
+
+        if (partyName === '') {
+            validationSpan.textContent = "Please provide a party name";
+            return false;
+        } else {
+            validationSpan.textContent = "";
+            return true;
+        }
+    }
+
+ 
+    document.getElementById('saveparty').addEventListener('click', function(event) {
+        if (!validatePartyName()) {
+            event.preventDefault(); 
+        }
+    });
+</script>
+
+
                 <script>
                     function toggleSection(sectionId) {
                         // Get all the fieldsets
@@ -1393,6 +1516,7 @@ function addToDropdown(data, response) {
         const gstin = inputElement.value;
         const validationSpan = document.getElementById("gstno-validation");
 
+        
         // Regular expression to check for a valid GSTIN pattern
         const regex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9][A-Z][A-Z0-9]$/;
 

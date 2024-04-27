@@ -2753,6 +2753,7 @@ def edit_debit_note(request, debit_id):
     else:  # Handling GET request
         parties = Party.objects.filter(company_id=cmp)
         items = Item.objects.filter(company_id=cmp)
+        unit = Unit.objects.filter(company=cmp)
         debits = DebitNote.objects.filter(user=request.user).prefetch_related('debitnotehistory_set')
         current_date = debitnote.created_at.strftime('%Y-%m-%d') if debitnote.created_at else timezone.now().strftime('%Y-%m-%d')
         bills = PurchaseBill.objects.filter(party=debitnote.party)
@@ -2781,7 +2782,7 @@ def edit_debit_note(request, debit_id):
             'items': items,
             'debits': debits,
             'company_id': cmp,
-            
+            'unit':unit,
             'user_id': user_id,
             'usr': request.user,
             'selected_party': debitnote.party.id if debitnote.party else None,
