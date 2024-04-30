@@ -211,9 +211,9 @@
         color: white;
         width: 50px;
     }
-       td{
+       /* td{
     border-right: 1px solid rgb(12, 12, 12);
-  }
+  } */
   th{
     width: 100px;
   }
@@ -281,6 +281,12 @@
     .btn-custom {
     background-color: #68020F;
     border-color: #68020F;
+    
+}.btn-custom:hover,
+.btn-custom:focus {
+    background-color: black;
+    border-color: #68020F;
+    color: white; /* Change text color on hover */
 }
 .border-maroon {
     border-color: #68020F;
@@ -370,7 +376,7 @@
                 
                                 <th scope="col" style="border-right: 1px solid; position: relative;">
                                     Date&nbsp;&nbsp;
-                                    <i class="fa fa-filter" aria-hidden="true" onclick="toggleFilterBoxdate(this)" style="color: #3498db;"></i>
+                                    <i class="fa fa-filter" aria-hidden="true" onclick="toggleFilterBoxdate(this)" style="color:  white;"></i>
                                     <div class="filter-box" id="dateFilterBox">
                                         <select id="dateFilterOption" style="width: 190px;" onchange="toggleDateInput()">
                                             <option value="equalto">Equal to</option>
@@ -401,7 +407,7 @@
                                 </th>
                                 <th scope="col" style="border-right: 1px solid; width: 300px;">
                                     Ref.No
-                                    <i class="fa fa-filter" aria-hidden="true" onclick="toggleFilterBox(this)" style="color: #3498db;"></i>
+                                    <i class="fa fa-filter" aria-hidden="true" onclick="toggleFilterBox(this)" style="color:  white;"></i>
                                     <div class="filter-box" id="refNoFilterBox" style="width:200px">
                                         <select style="width: 190px;">
                                             <option value="exact">Exact match</option>
@@ -416,7 +422,7 @@
                                 </th>
                                 <th scope="col" style="border-right: 1px solid; width: 500px;">
                                     Party Name&nbsp;&nbsp;
-                                    <i class="fa fa-filter" aria-hidden="true" style="color: #3498db; cursor: pointer;" onclick="toggleFilterBox1()"></i>
+                                    <i class="fa fa-filter" aria-hidden="true" style="color:  white; cursor: pointer;" onclick="toggleFilterBox1()"></i>
                                     <div class="filter-box" id="partyNameFilterBox" style="width:200px">
                                         <select id="optionSelect" style="width: 190px;" onchange="handleOptionChange()">
                                             <option value="exact">Exact match</option>
@@ -429,7 +435,7 @@
                                         </div>
                                     </div>
                                 </th>
-                                <th scope="col" style="border-right: 1px solid;width: 120px;">Type<i class="fa fa-filter" aria-hidden="true" onclick="toggleFilterBox(this)" style="color: #3498db;"></i>
+                                <th scope="col" style="border-right: 1px solid;width: 120px;">Type<i class="fa fa-filter" aria-hidden="true" onclick="toggleFilterBox(this)" style="color:  white;"></i>
                                     <div class="filter-box" id="typeFilterBox">
                                         <select style="width: 190px;">
                                             <option value="exact">Exact match</option>
@@ -444,7 +450,7 @@
                                 </th>
                                 <th scope="col" style="border-right: 1px solid;width: 400px;">
                                     Total
-                                    <i class="fa fa-filter" aria-hidden="true" onclick="toggleFilterBox('totalFilterBox')" id="totalFilterBoxIcon" style="color: #3498db;"></i>
+                                    <i class="fa fa-filter" aria-hidden="true" onclick="toggleFilterBox('totalFilterBox')" id="totalFilterBoxIcon" style="color:  white;"></i>
                                     <div class="filter-box" id="totalFilterBox" style="width: 200px; display: none;">
                                         <select style="width: 190px;" id="totaloptions">
                                             <option value="equalto">Equal to</option>
@@ -460,7 +466,7 @@
                                 </th>
                                 <!-- Add more th elements as needed -->
                 
-                                <th scope="col" style="border-right: 1px solid;width: 350px;">Action<i class="fa fa-filter" aria-hidden="true" onclick="toggleFilterBox(this)" style="color: #3498db;"></i>
+                                <th scope="col" style="border-right: 1px solid;width: 350px;">Action<i class="fa fa-filter" aria-hidden="true" onclick="toggleFilterBox(this)" style="color: white;"></i>
                                     <div class="filter-box1" id="actionFilterBox" style="width:200px">
                                         <select style="width: 190px;">
                                             <option value="exact">Exact match</option>
@@ -473,7 +479,7 @@
                                         </div>
                                     </div>
                                 </th>
-                                <th scope="col" style="border-right: 1px solid;width: 100px;">By<i class="fa fa-filter" aria-hidden="true" onclick="toggleFilterBox(this)" style="color: #3498db;"></i>
+                                <th scope="col" style="border-right: 1px solid;width: 100px;">By<i class="fa fa-filter" aria-hidden="true" onclick="toggleFilterBox(this)" style="color:  white;"></i>
                                     <div class="filter-box2" id="byFilterBox" style="width:200px">
                                         <select style="width: 190px;">
                                             <option value="exact">Exact match</option>

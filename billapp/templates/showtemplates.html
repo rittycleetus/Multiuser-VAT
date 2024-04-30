@@ -155,13 +155,13 @@
             font-weight: bold;
         }
         .debit-head-middle-left, .debit-head-bottom-left {
-            color: #007bff; /* Blue text color */
+            color: #007bff; 
         }
         .debit-head-middle-right, .debit-head-bottom-right {
-            color: #007bff; /* Blue text color */
+            color: #007bff; 
         }
         .debit-head-middle-left .text-bold, .debit-head-bottom-left .text-bold {
-            color: #007bff; /* Blue text color */
+            color: #007bff; 
         }
         .debit-head-middle-right .text-bold, .debit-head-bottom-right .text-bold {
             color: #dc3545; /* Red text color */
@@ -176,10 +176,10 @@
             padding: 8px;
             text-align: left;
         }
-        .debit-body th {
-            background-color: #007bff; /* Blue background for table headers */
-            color: #fff; /* White text color */
-        }
+        /* .debit-body th {
+            background-color: #007bff; /
+            color: #fff; 
+        } */
         .debit-body tr:nth-child(even) {
             background-color: #f2f2f2; /* Light gray background for even rows */
         }
@@ -451,7 +451,7 @@
                                                 <div class="table-responsive">
                                                     <table class="table">
                                                     <thead>
-                                                        <tr>
+                                                        <tr style="background-color:skyblue;">
                                                             <th class="text-bold">Item Name</th>
                                                             <th class="text-bold">HSN</th>
                                                             <th class="text-bold">Quantity</th>
@@ -515,16 +515,17 @@
                                             <h1 style="text-align: center; background-color: rgb(181, 167, 233);">DEBIT NOTE</h1>
                                             <div class="debit-head-center;" style="background-color: rgb(181, 167, 233);">
                                                 <ul style="text-align: center;">
-                                                    <li style="background-color: rgb(181, 167, 233); ">{{ company.company_name }}</li>
-                                                    <li style="background-color: rgb(181, 167, 233);">{{ company.address }}</li>
+                                                    <li style="background-color: rgb(181, 167, 233); "><b>{{ company.company_name }}</b></li>
+                                                    <li style="background-color: rgb(181, 167, 233);"><b>{{ company.address }}</b></li>
                                                 </ul>
                                             </div>
                                         </div>
                                         <div class="debit-head-bottom" style="display: flex; flex-wrap: wrap;">
                                             <div class="debit-head-bottom-left text-start" style="flex: 1;">
                                                 <ul>
-                                                    <li class='text-bold' style="color: red;">TO,</li>
+                                                    <li class='text-bold' style="color: red;background-color: rgb(190, 189, 189);width: 150px;">BILLING ADDRESS</li>
                                                     <li><b>{{ party.party_name }}</b></li>
+                                                    <li>{{party.contact}}</li>
                                                     <li>{{ party.address }}</li>
                                                 </ul>
                                             </div>
@@ -538,13 +539,13 @@
                                                 
                                                 <table class="table-responsive" id="debit-table">
                                                     
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="text-bold">Item Name</th>
+                                                       <thead style="color: black;">
+        <tr style="background-color: rgb(181, 167, 233);">
+                                                            <th class="text-bold">Item </th>
                                                             <th class="text-bold">HSN</th>
                                                             <th class="text-bold">Quantity</th>
-                                                            <th class="text-bold">Rate</th>
-                                                            <th class="text-bold">Tax</th>
+                                                            <th class="text-bold">Price</th>
+                                                            <th class="text-bold">Tax(%)</th>
                                                             <th class="text-bold">Discount</th>
                                                             <th class="text-bold">Total</th>
                                                         </tr>
@@ -601,7 +602,7 @@
                                         <div class="debit-head-top">
                                             <div class="debit-head-top-left text-start">
                                                 <ul>
-                                                    <li><b>{{ company.company_name }}</b></li>
+                                                    <li style="color: red;font-size: 30px;"><b>{{ company.company_name }}</b></li>
                                                     <li>{{ company.address }}</li>
                                                     <li>{{ company.contact }}</li>
                                                 </ul>
@@ -628,9 +629,9 @@
                                     </div>
                                     <div class="debit-body" style="overflow-x: auto;">
                                         <table class="table-responsive" id="debit-table">
-                                            <thead>
-                                                <tr>
-                                                    <th class="text-bold">Item Name</th>
+                                            <thead style="color: maroon;">
+                                                <tr style="background-color: rgb(126, 117, 117);">
+                                                    <th class="text-bold">Item </th>
                                                     <th class="text-bold">HSN</th>
                                                     <th class="text-bold">Quantity</th>
                                                     <th class="text-bold">Rate</th>
@@ -656,6 +657,7 @@
                                         </div>
                                         <br>
                                         <div class="debit-body-info">
+
                                             <div class="debit-body-info-item">
                                                 <div class="info-item-td text-end text-bold">Sub Total:</div>
                                                 <div class="info-item-td text-end">{{ debit_note.subtotal }}</div>
