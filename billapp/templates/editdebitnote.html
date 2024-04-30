@@ -1077,7 +1077,8 @@ function validateFields() {
                            <div class="col-md-9 row" style="margin-top: 3vw;">
                                <div class="col-md-4">
                                    <input type="text" style="background-color: white;" class="form-control" id="partyname" name="partyname" placeholder="Party Name" required>
-                               </div>       
+                                   <span id="partyname-validation" style="color: red;"></span>
+                                </div>       
 
                                <div class="col-md-4" style="position: relative;">
                                 <input required type="text" style="background-color: white;" class="form-control" id="trn_no" name="trn_no" placeholder="TRN NO" oninput="validateGSTIN(this)">
@@ -1109,6 +1110,7 @@ function validateFields() {
                                        <option>Registered Business - Composition</option>
                                    </select>
                                </div>
+                               <span id="trn_type-validation" style="color: red;"></span>
                                <div class="col-sm-5">
                                   
                                    <textarea style="background-color: white;" class="form-control mt-4" name="address1" id="address1" cols="56" rows="3"
@@ -1125,20 +1127,24 @@ function validateFields() {
                        
                        <div class="col-sm-5 ">
                            <input style="background-color: white;" type="email" class="form-control mt-4" id="email" name="email" placeholder="Email">
-                       </div>
+                           <span id="email-validation" style="color: red;"></span>
+                        </div>
                        </fieldset>
                
                        <fieldset id="Credit" class="Credit" style="display:none;">
                            <div class="col-sm-5">
                                <input style="background-color: white;" type="number" class="form-control mt-4" id="balance" name="balance" placeholder="Opening Balance">
-                           </div>
+                               <span id="balance-validation" style="color: red;"></span>
+                            </div>
                        
                            <div  class="col-sm-7 mt-4">
                                <label class="radio-label">To Pay</label>
                                <input type="radio" class="radio-input" id="toPayRadio" name="paymentType" value="To Pay" style="margin-right: 2vw; margin-left: 5px;">
                                <label class="radio-label">To Receive</label>
                                <input type="radio" class="radio-input" id="toReceiveRadio" name="paymentType" value="To Receive" style="margin-right: 2vw; margin-left: 5px;">
-                           </div>
+                          
+                               <span id="paymentType-validation" style="color: red;"></span>
+                              </div>
                        
                           
                        
@@ -1179,6 +1185,31 @@ function validateFields() {
    <script>
        
    function saveParty() {
+    
+    if (!validatePartyName()) {
+            // Return false if validation fails
+            return false;
+        }
+        if (!validateTRN()) {
+            // Return false if validation fails
+            return false;
+        }
+        if (!validateEmail()) {
+            // Return false if validation fails
+            return false;
+        }
+        if (!validateBalance()) {
+            // Return false if validation fails
+            return false;
+        }
+        if (!validatePaymentType()) {
+            // Return false if validation fails
+            return false;
+        }
+        if (!validateTRNType()) {
+            // Return false if validation fails
+            return false;
+        }
    
        const partyName = document.getElementById('partyname').value;
        const trnNo = document.getElementById('trn_no').value;
@@ -1381,6 +1412,125 @@ $(document).ready(function () {
    window.onload = clearFieldsOnLoad;
 </script>
 
+
+<script>
+    function validatePartyName() {
+        const partyName = document.getElementById('partyname').value.trim();
+        const validationSpan = document.getElementById('partyname-validation');
+
+        if (partyName === '') {
+            validationSpan.textContent = "Please provide a party name";
+            return false;
+        } else {
+            validationSpan.textContent = "";
+            return true;
+        }
+    }
+
+ 
+    document.getElementById('saveparty').addEventListener('click', function(event) {
+        if (!validatePartyName()) {
+            event.preventDefault(); 
+        }
+    });
+</script>
+<script>
+    function validateTRN() {
+        const trnNo = document.getElementById('trn_no').value.trim();
+        const validationSpan = document.getElementById('trn_no_error');
+
+        if (trnNo === '') {
+            validationSpan.textContent = "Please provide a TRN No";
+            return false;
+        } else {
+            validationSpan.textContent = "";
+            return true;
+        }
+    }
+
+    document.getElementById('trn_no').addEventListener('input', validateTRN);
+
+    document.getElementById('saveparty').addEventListener('click', function(event) {
+        if (!validateTRN()) {
+            event.preventDefault(); 
+        }
+    });
+</script>
+<script>
+function validateEmail() {
+    const email = document.getElementById('email').value.trim();
+    const emailValidation = document.getElementById('email-validation');
+    if (email === '') {
+        emailValidation.textContent = "Please provide an Email";
+        return false;
+    } else {
+        emailValidation.textContent = "";
+        return true;
+    }
+}
+
+function validateBalance() {
+    const balance = document.getElementById('balance').value.trim();
+    const balanceValidation = document.getElementById('balance-validation');
+    if (balance === '') {
+        balanceValidation.textContent = "Please provide an Opening Balance";
+        return false;
+    } else {
+        balanceValidation.textContent = "";
+        return true;
+    }
+}
+
+function validatePaymentType() {
+    const toPayRadio = document.getElementById('toPayRadio');
+    const toReceiveRadio = document.getElementById('toReceiveRadio');
+    const paymentTypeValidation = document.getElementById('paymentType-validation');
+    if (!toPayRadio.checked && !toReceiveRadio.checked) {
+        paymentTypeValidation.textContent = "Please select a Payment Type";
+        return false;
+    } else {
+        paymentTypeValidation.textContent = "";
+        return true;
+    }
+}
+
+document.getElementById('saveparty').addEventListener('click', function(event) {
+    // Validate email
+    const isEmailValid = validateEmail();
+    // Validate opening balance
+    const isBalanceValid = validateBalance();
+    // Validate payment type
+    const isPaymentTypeValid = validatePaymentType();
+
+    // If any of the validations fail, prevent form submission
+    if (!isEmailValid || !isBalanceValid || !isPaymentTypeValid) {
+        event.preventDefault();
+    }
+});
+</script>
+<script>
+function validateTRNType() {
+    const trnType = document.getElementById('trn_type').value;
+    const trnTypeValidation = document.getElementById('trn_type-validation');
+    if (trnType === '') {
+        trnTypeValidation.textContent = "Please select a TRN Type";
+        return false;
+    } else {
+        trnTypeValidation.textContent = "";
+        return true;
+    }
+}
+
+document.getElementById('saveparty').addEventListener('click', function(event) {
+    // Validate TRN type
+    const isTRNTypeValid = validateTRNType();
+
+    // If TRN type validation fails, prevent form submission
+    if (!isTRNTypeValid) {
+        event.preventDefault();
+    }
+});
+</script>
             <script>
                 function toggleSection(sectionId) {
                     // Get all the fieldsets

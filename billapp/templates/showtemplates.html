@@ -906,7 +906,7 @@
    
        var printWindow = window.open('', '_blank');
    
-       printWindow.document.write('<html><head><title>Template PDF</title></head><body>');
+       printWindow.document.write('<html><head><title>DEBIT NOTE</title></head><body>');
        printWindow.document.write('<style>');
        printWindow.document.write('ul { list-style: none; }');
        // Include your CSS styles here
@@ -1070,7 +1070,7 @@ var loadingIndicator = document.createElement('div'); loadingIndicator.innerText
         var element = printWindow.document.body;
         var opt = {
             margin: 1,
-            filename: 'Template_PDF.pdf', 
+            filename: 'DEBITNOTE.pdf', 
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 2 },
             jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
