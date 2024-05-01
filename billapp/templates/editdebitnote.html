@@ -2275,16 +2275,22 @@ updateTotals();
 </script>
 <script>
 $(document).ready(function () {
-    // Delete row when delete icon is clicked
+  
     $(document).on('click', '.delete-row', function () {
-        // Find the closest 'tr' (table row) and remove it
+        // Get the parent table body
+        var tableBody = $(this).closest('tbody');
+
+        // Remove the row
         $(this).closest('tr').remove();
 
         // Update the row numbers after deletion
-        updateRowNumbers();
+        updateRowNumbers(tableBody);
+
+        // Update the calculations
+        updateTotals();
+        updateTaxAmount();
     });
 });
-
 // Function to update row numbers after deletion
 function updateRowNumbers() {
     // Get all rows in the table body
@@ -2325,24 +2331,24 @@ function updateTotals() {
     var totalAmountFields = document.querySelectorAll('[name="item_total_amount[]"]');
     var selectElements = document.querySelectorAll('[name="selected_item[]"]');
 
-    // Set default values to 0
-    quantityFields.forEach(function (element) {
-        element.value = 0;
-    });
+    // // Set default values to 0
+    // quantityFields.forEach(function (element) {
+    //     element.value = 0;
+    // });
 
-    discountFields.forEach(function (element) {
-        element.value = 0;
-    });
+    // discountFields.forEach(function (element) {
+    //     element.value = 0;
+    // });
 
-    totalAmountFields.forEach(function (element) {
-        element.value = 0;
-    });
+    // totalAmountFields.forEach(function (element) {
+    //     element.value = 0;
+    // });
 
     // Set other default values or call additional initialization functions if needed
-    document.getElementById('subtotal').value = '0.00';
-    document.getElementById('grandTotal').value = '0.00';
-    document.getElementById('taxAmount').value = '0.00';
-    document.getElementById('adjustment').value = '0.00';
+    // document.getElementById('subtotal').value = '0.00';
+    // document.getElementById('grandTotal').value = '0.00';
+    // document.getElementById('taxAmount').value = '0.00';
+    // document.getElementById('adjustment').value = '0.00';
 
     // Reset select options
     selectElements.forEach(function (selectElement) {

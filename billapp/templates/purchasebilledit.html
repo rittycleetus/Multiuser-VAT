@@ -187,7 +187,6 @@
                                                         <td style="text-align: center; width:2%" class="nnum">
                                                             {{ forloop.counter }}<input type="text"  name='id[]' value="{{ j.id }}" hidden>
                                                         </td>
-
                                                         <td style="width:18%" >
                                                             <div class="d-flex">
                                                                 <select name='product[]' id="product{{ j.id }}" class="form-control border-danger product select2 itemselect" onchange="changeprd1(this,`{{j.id}}`)" style="color: black; background-color: white;">
@@ -202,12 +201,8 @@
                                                                 <button id="modal_closing" type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#newitem" data-bs-whatever="@mdo">
                                                                     <span class="fa fa-plus"></span>
                                                                 </button>
-                                                                
-                                                                
-                                                                
-                                                            </div>
+                                                             </div>                                                            </div>
                                                         </td>
-
                                                         <td style="width:15%">
                                                             <input type="text" name='hsn[]'  value="{{ j.product.itm_hsn }}" id="hsn{{ j.id }}" class="form-control border-danger" style="color: black; background-color: white;"/>
                                                         </td>

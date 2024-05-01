@@ -7,6 +7,11 @@
 
 
 <style>
+    .com-info{
+        font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        font-size: 15px;
+        color: black;
+    }
     .g-1
     {
         gap: 0.70rem;
@@ -39,10 +44,20 @@
         font-weight: 700;
         letter-spacing: 1px;
     }
-    .templates
-    {
-        overflow-x: scroll;
-    }
+    .templates {
+            /* /* width: 100%;
+            max-width: 1000px;  */
+         margin: 0 auto; 
+            /* padding: 20px; */
+            box-sizing: border-box;
+            
+        }
+        .debit-wrapper {
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
     @media (max-width:632px)
     {
         .form-group .top-title
@@ -94,7 +109,7 @@
 
     .debit-head-middle,
     .debit-head-bottom {
-        margin-bottom: 20px;
+        margin-bottom: 50px;
     }
 
    
@@ -187,14 +202,15 @@
             background-color: #ddd; /* Darker gray background on hover */
         }
         .debit-body-bottom {
-            margin-top: 20px;
-            border-top: 1px solid #ccc; /* Gray border on top */
+            margin-top: 40px;
+            border-top: 1px solid #ccc; 
             padding-top: 10px;
         }
         .debit-body-info-item {
             display: flex;
             justify-content: space-between;
             margin-bottom: 10px;
+            
         }
         .info-item-td {
             flex: 1;
@@ -324,13 +340,20 @@
         margin-right: 10%; /* Center the button horizontally */
     }
 }
+#page-wrapper {
+    width: 160mm; /* A4 width */
+    height: 207mm; /* A4 height */
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
 </style>
 
 
 
 <div class="body-wrapper">
 
-<div class="container-fluid bg-light" >  
+ <div class="container-fluid bg-light">
     <div class="row ">
         <div class="col-sm-12 col-lg-12  ">
             <div class="card bg-light bs">
@@ -409,11 +432,11 @@
                     <h3>TEMPLATES</h3>
                     <hr>
                     
-                    <div class="templates">
+                    <div class="templates" id="tem">
 
                         <div class="debit-wrapper" id="template1">
                             <div class="debit" id="print-area">
-                                <div class="debit-container" id="slipdiv">
+                                <div class="debit-container" id="page-wrapper">
                                     <div class="debit-head">
                                             <div class="debit-head-top">
                                                 <div class="debit-head-top-left text-start">
@@ -421,7 +444,7 @@
                                             </div>
                                             <div class="hr"></div>
                                             <div class="debit-head-middle">
-                                                <h1 style="text-align: center;">DEBIT NOTE</h1>
+                                                <h1 style="text-align: center;background-color: skyblue;background-size: 30%";>DEBIT NOTE</h1>
                                                 <div class="debit-head-middle-left text-start">
                                                     <p><span class="text-bold" style="color: darkblue;">Debit Date:</span> {{ debit_note.created_at|date:'d-m-Y' }}</p>
                                                     <p><span class="text-bold" style="color: darkblue;">Debit No:</span> {{ debit_note.returnno }}</p>
@@ -433,15 +456,19 @@
                                                 <div class="debit-head-bottom-left">
                                                     <ul>
                                                         <li class='text-bold' style="color: darkblue;">FROM,</li>
-                                                        <li>{{ company.company_name }}</li>
-                                                        <li>{{ company.address }}</li>
+                                                        <li class="com-info">{{ company.company_name }}</li>
+                                                        <li class="com-info">{{ company.address }}</li>
+                                                        <li class="com-info">{{ company.city }},{{ company.state }}</li>
+                                                        
+                                                        <li class="com-info">{{ company.contact }}</li>
                                                     </ul>
                                                 </div>
                                                 <div class="debit-head-bottom-right">
                                                     <ul class="text-end">
                                                         <li class='text-bold' style="color: darkblue;">TO,</li>
-                                                        <li>{{ party.party_name }}</li>
-                                                        <li>{{ party.address }}</li>
+                                                        <li class="com-info">{{ party.party_name }}</li>
+                                                        <li class="com-info">{{ party.address }}</li>
+                                                        <li class="com-info">{{ party.contact }}</li>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -504,7 +531,7 @@
 
                         <div class="debit-wrapper" id="template2">
                             <div class="debit" id="print-area">
-                                <div class="debit-container" id="slipdiv">
+                                <div class="debit-container" id="page-wrapper">
                                     <div class="debit-head">
                                             <div class="debit-head-top">
                                                 <div class="debit-head-top-left text-start">
@@ -515,15 +542,15 @@
                                             <h1 style="text-align: center; background-color: rgb(181, 167, 233);">DEBIT NOTE</h1>
                                             <div class="debit-head-center;" style="background-color: rgb(181, 167, 233);">
                                                 <ul style="text-align: center;">
-                                                    <li style="background-color: rgb(181, 167, 233); "><b>{{ company.company_name }}</b></li>
-                                                    <li style="background-color: rgb(181, 167, 233);"><b>{{ company.address }}</b></li>
+                                                    <li style="background-color: rgb(181, 167, 233);font-size: 20px; "><b>{{ company.company_name }}</b></li>
+                                                    <li style="background-color: rgb(181, 167, 233);font-size: 20px;"><b>{{ company.address }}</b></li>
                                                 </ul>
                                             </div>
                                         </div>
                                         <div class="debit-head-bottom" style="display: flex; flex-wrap: wrap;">
                                             <div class="debit-head-bottom-left text-start" style="flex: 1;">
                                                 <ul>
-                                                    <li class='text-bold' style="color: red;background-color: rgb(190, 189, 189);width: 150px;">BILLING ADDRESS</li>
+                                                    <li class='text-bold' style="color: red;background-color: rgb(190, 189, 189);width: 150px;">SHIPPING ADDRESS</li>
                                                     <li><b>{{ party.party_name }}</b></li>
                                                     <li>{{party.contact}}</li>
                                                     <li>{{ party.address }}</li>
@@ -597,7 +624,10 @@
                             <div class="debit" id="print-area">
                           
                         
-                                <div class="debit-container" id="slipdiv">
+                                <div class="debit-container" id="page-wrapper">
+                                    <div class="debit-head-middle" >
+                                        <h1 style="text-align: center;">DEBIT NOTE</h1>
+                                    </div>
                                     <div class="debit-head">
                                         <div class="debit-head-top">
                                             <div class="debit-head-top-left text-start">
@@ -609,9 +639,7 @@
                                             </div>
                                         </div>
                                         <hr style="color: black; border-width: 2px;border-style: solid;">
-                                        <div class="debit-head-middle" >
-                                            <h1 style="text-align: center;">DEBIT NOTE</h1>
-                                        </div>
+                                        
                                         <div class="debit-head-bottom">
                                             <div class="debit-head-bottom-left">
                                                 <ul>
@@ -656,7 +684,8 @@
                                         </table>
                                         </div>
                                         <br>
-                                        <div class="debit-body-info">
+                                        
+                                        <div class="debit-body-info" style="margin-top: 80px;">
 
                                             <div class="debit-body-info-item">
                                                 <div class="info-item-td text-end text-bold">Sub Total:</div>
@@ -753,7 +782,7 @@
    
    }
        .debit-wrapper {
-           margin-top: 50px; /* Adjust the top margin as needed */
+           margin-top: 20px; /* Adjust the top margin as needed */
        
       
            
@@ -776,7 +805,7 @@
    
        .debit-head-middle,
        .debit-head-bottom {
-           margin-bottom: 20px;
+           margin-bottom: 50px;
        }
    
        .debit-body {
@@ -874,7 +903,7 @@
                background-color: #ddd; /* Darker gray background on hover */
            }
            .debit-body-bottom {
-               margin-top: 20px;
+               margin-top: 80px;
                border-top: 1px solid #ccc; /* Gray border on top */
                padding-top: 10px;
            }
@@ -918,7 +947,7 @@
    
    }
        .debit-wrapper {
-           margin-top: 50px; /* Adjust the top margin as needed */
+           margin-top: 20px; /* Adjust the top margin as needed */
        
       
            
@@ -941,7 +970,7 @@
    
        .debit-head-middle,
        .debit-head-bottom {
-           margin-bottom: 20px;
+           margin-bottom: 50px;
        }
    
        .debit-body {
@@ -1039,7 +1068,7 @@
                background-color: #ddd; /* Darker gray background on hover */
            }
            .debit-body-bottom {
-               margin-top: 20px;
+               margin-top: 80px;
                border-top: 1px solid #ccc; /* Gray border on top */
                padding-top: 10px;
            }
@@ -1130,7 +1159,7 @@ function getCurrentTemplateId() {
    
    }
        .debit-wrapper {
-           margin-top: 50px; /* Adjust the top margin as needed */
+           margin-top: 20px; /* Adjust the top margin as needed */
        
       
            
@@ -1153,7 +1182,7 @@ function getCurrentTemplateId() {
    
        .debit-head-middle,
        .debit-head-bottom {
-           margin-bottom: 20px;
+           margin-bottom: 50px;
        }
    
        .debit-body {
@@ -1251,7 +1280,7 @@ function getCurrentTemplateId() {
                background-color: #ddd; /* Darker gray background on hover */
            }
            .debit-body-bottom {
-               margin-top: 20px;
+               margin-top: 80px;
                border-top: 1px solid #ccc; /* Gray border on top */
                padding-top: 10px;
            }
@@ -1365,7 +1394,7 @@ function getCurrentTemplateId() {
                overflow: hidden;
            }
            .debit-wrapper {
-               margin-top: 50px; /* Adjust the top margin as needed */
+               margin-top: 20px; /* Adjust the top margin as needed */
            }
            .debit-head {
                margin-bottom: 20px;
@@ -1382,7 +1411,7 @@ function getCurrentTemplateId() {
            }
            .debit-head-middle,
            .debit-head-bottom {
-               margin-bottom: 20px;
+               margin-bottom: 50px;
            }
            .debit-body {
                overflow-x: auto;
@@ -1479,7 +1508,7 @@ function getCurrentTemplateId() {
                background-color: #ddd; /* Darker gray background on hover */
            }
            .debit-body-bottom {
-               margin-top: 20px;
+               margin-top: 80px;
                border-top: 1px solid #ccc; /* Gray border on top */
                padding-top: 10px;
            }
@@ -1549,6 +1578,19 @@ function getCurrentTemplateId() {
    
    
    </script>
-            
+       <!-- <script>
+        function PDF(){
+    var element = document.getElementById('template1');
+    var opt =
+    {
+        margin: [0.5, 0.3, 0.3, 0.5],
+        filename: 'Report_PurchaseOrderDetails' ,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save();
+}
+       </script>      -->
 {% endblock %}
 

@@ -317,7 +317,7 @@
                                         <div class="d-flex align-items-center">
                                             <button class="btn mt-3" type="button" onclick="downloadExcel()" style="margin-left: 2vh;">
                                                 <span><img width="30px" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8MIAwEUzmg555EHpPgTVAMxo8vzR4bc2E4A&usqp=CAU" alt="no img"></span>
-                                                <br><span style="color: black; font-size: small; font-weight: bold;">Excel</span>
+                                                <br><span style="color: black; font-size: 15px; font-weight: bold;">Excel</span>
                                             </button>
                                             <button class="btn mt-3" type="button" onclick="printPDFWithTable()" style="margin-left: 2vh;">
                                                
@@ -328,7 +328,7 @@
                                       
                                       
                                       
-                                        <br><span style="color: black; font-size: small; font-weight: bold;">Print</span>
+                                        <br><span style="color: black; font-size: 15px; font-weight: bold;">Print</span>
                                     </button>
                                     </div>
                                 </div>
@@ -362,7 +362,7 @@
             
                     <div class="row">
                         <div class="col-md-12" style="margin-left: 2vh;">
-                            <div class="mt-3" style="overflow: scroll;height: 28rem; width: 97%;" id="tablediv">
+                            <div class="mt-3"  id="tablediv">
                                 <!-- Table -->
                                 <div class="table-responsive">
             
@@ -371,10 +371,10 @@
                 
                     <table class="table table-hover mt-4 table-bordered table-dangerbtn-danger table-striped tb table-responsive w-100" id="debitTable">
                         <thead style="background: #68020F;">
-                            <tr class="text-start text-light" style="font-size: 12px;">
+                            <tr class="text-start text-light" style="font-size: 14px;font-weight: 400;">
                                 <th scope="col" class="custom-width" style="border-right: 1px solid;">#</th>
                 
-                                <th scope="col" style="border-right: 1px solid; position: relative;">
+                                <th scope="col" style="border-right: 1px solid; position: relative;width: 400px;">
                                     Date&nbsp;&nbsp;
                                     <i class="fa fa-filter" aria-hidden="true" onclick="toggleFilterBoxdate(this)" style="color:  white;"></i>
                                     <div class="filter-box" id="dateFilterBox">
@@ -405,7 +405,7 @@
                                         </div>
                                     </div>
                                 </th>
-                                <th scope="col" style="border-right: 1px solid; width: 300px;">
+                                <th scope="col" style="border-right: 1px solid; width:200px;">
                                     Ref.No
                                     <i class="fa fa-filter" aria-hidden="true" onclick="toggleFilterBox(this)" style="color:  white;"></i>
                                     <div class="filter-box" id="refNoFilterBox" style="width:200px">
@@ -420,8 +420,8 @@
                                         </div>
                                     </div>
                                 </th>
-                                <th scope="col" style="border-right: 1px solid; width: 500px;">
-                                    Party Name&nbsp;&nbsp;
+                                <th scope="col" style="border-right: 1px solid; width: 300px;">
+                                    Party &nbsp;&nbsp;
                                     <i class="fa fa-filter" aria-hidden="true" style="color:  white; cursor: pointer;" onclick="toggleFilterBox1()"></i>
                                     <div class="filter-box" id="partyNameFilterBox" style="width:200px">
                                         <select id="optionSelect" style="width: 190px;" onchange="handleOptionChange()">
@@ -466,7 +466,7 @@
                                 </th>
                                 <!-- Add more th elements as needed -->
                 
-                                <th scope="col" style="border-right: 1px solid;width: 350px;">Action<i class="fa fa-filter" aria-hidden="true" onclick="toggleFilterBox(this)" style="color: white;"></i>
+                                <th scope="col" style="border-right: 1px solid;width: 250px;">Action<i class="fa fa-filter" aria-hidden="true" onclick="toggleFilterBox(this)" style="color: white;"></i>
                                     <div class="filter-box1" id="actionFilterBox" style="width:200px">
                                         <select style="width: 190px;">
                                             <option value="exact">Exact match</option>
@@ -479,7 +479,7 @@
                                         </div>
                                     </div>
                                 </th>
-                                <th scope="col" style="border-right: 1px solid;width: 100px;">By<i class="fa fa-filter" aria-hidden="true" onclick="toggleFilterBox(this)" style="color:  white;"></i>
+                                <th scope="col" style="border-right: 1px solid;width: 200px;">By<i class="fa fa-filter" aria-hidden="true" onclick="toggleFilterBox(this)" style="color:  white;"></i>
                                     <div class="filter-box2" id="byFilterBox" style="width:200px">
                                         <select style="width: 190px;">
                                             <option value="exact">Exact match</option>
@@ -497,7 +497,7 @@
                         </thead>
                 
                         
-                            <tbody id="searchResults" style="font-size: 12px;font-weight: 700;">
+                            <tbody id="searchResults" style="font-size: 14px;font-weight: 400;">
                                 {% for debit in debits %}
                                 <tr onclick="viewAction('{{ debit.id }}')">
                                     <td>{{ forloop.counter }}</td>

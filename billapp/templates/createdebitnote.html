@@ -2260,17 +2260,23 @@ updateTotals();
 
 </script>
 <script>
-$(document).ready(function () {
-    // Delete row when delete icon is clicked
-    $(document).on('click', '.delete-row', function () {
-        // Find the closest 'tr' (table row) and remove it
-        $(this).closest('tr').remove();
-
-        // Update the row numbers after deletion
-        updateRowNumbers();
+    $(document).ready(function () {
+      
+        $(document).on('click', '.delete-row', function () {
+            // Get the parent table body
+            var tableBody = $(this).closest('tbody');
+    
+            // Remove the row
+            $(this).closest('tr').remove();
+    
+            // Update the row numbers after deletion
+            updateRowNumbers(tableBody);
+    
+            // Update the calculations
+            updateTotals();
+            updateTaxAmount();
+        });
     });
-});
-
 // Function to update row numbers after deletion
 function updateRowNumbers() {
     // Get all rows in the table body
